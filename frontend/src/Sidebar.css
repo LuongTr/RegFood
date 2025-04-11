@@ -1,0 +1,88 @@
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 250px;
+    background-color: #fff;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    padding: 20px 10px;
+    transition: width 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .sidebar.collapsed {
+    width: 50px;
+    align-items: center;
+  }
+  
+  .logo-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 10px;
+    margin-bottom: 40px;
+    position: relative;
+  }
+  
+  .logo-icon {
+    font-size: 24px;
+    color: #6c63ff;
+  }
+  
+  .logo-text {
+    font-size: 20px;
+    font-weight: bold;
+    margin-left: 10px;
+    color: #222;
+    flex-grow: 1;
+  }
+  
+  .toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6c63ff;
+    font-size: 18px;
+    padding: 4px;
+    transition: transform 0.2s;
+  }
+  
+  .toggle-btn:hover {
+    transform: scale(1.2);
+  }
+  
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 10px;
+    width: 90%;
+    color: #222;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-radius: 8px;
+    text-decoration: none;
+  }
+  
+  .sidebar.collapsed .nav-item {
+    justify-content: center;
+  }
+  
+  .nav-item:hover {
+    background-color: #f3f3f3;
+  }
+  
+  .icon {
+    font-size: 18px;
+  }
+  
+  .nav-item.active {
+    background-color: #f3f3f3;
+    font-weight: bold;
+  }
+  

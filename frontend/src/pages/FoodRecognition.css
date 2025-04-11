@@ -1,0 +1,114 @@
+.upload-container {
+    max-width: 700px;
+    margin: auto;
+    padding: 30px;
+    font-family: sans-serif;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+  }
+  
+
+  .page-container {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    padding: 2rem;
+  }
+  
+  
+  .title {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .upload-box {
+    border: 2px dashed #ccc;
+    padding: 40px 20px;
+    border-radius: 12px;
+    background-color: white;
+    text-align: center;
+    margin-bottom: 30px;
+    position: relative;
+  }
+  
+  .upload-area {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .cloud-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+  }
+  
+  .choose-button {
+    background-color: #6c63ff;
+    border: none;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  
+  .result-section {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+  }
+  
+  .result-card {
+    display: flex;
+    align-items: center;
+    background-color: #f1f1f1;
+    border-radius: 12px;
+    padding: 10px;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .food-image {
+    width: 70px;
+    height: 70px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+  
+  .food-label {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+  
+  .confidence {
+    color: #666;
+  }
+  
+  .nutrition {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  
+  .nutrition-box {
+    background-color: #f1f1f1;
+    padding: 20px;
+    border-radius: 12px;
+    flex: 1;
+    text-align: center;
+  }
+  
+  .nutrition-box p {
+    font-size: 14px;
+    color: #777;
+  }
+  
+  .nutrition-box h4 {
+    font-size: 20px;
+    margin-top: 5px;
+  }
+  
