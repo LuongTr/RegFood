@@ -1,0 +1,21 @@
+.header {
+  background-color: #6c63ff;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  transition: margin-left 0.3s ease; /* Thêm hiệu ứng chuyển đổi */
+}
+
+body.sidebar-collapsed .header {
+  margin-left: 50px; /* Khi sidebar collapse */
+}
+
+body:not(.sidebar-collapsed) .header {
+  margin-left: 250px; /* Khi sidebar mở rộng */
+}
+
+.header-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+}

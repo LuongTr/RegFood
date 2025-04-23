@@ -1,0 +1,98 @@
+.calculator-page {
+  background-color: #f9fafb;
+  min-height: 100vh;
+  padding: 2rem;
+  transition: margin-left 0.3s ease; /* Thêm hiệu ứng chuyển đổi */
+  margin-left: 250px; /* Khoảng cách khi sidebar mở rộng */
+}
+
+body.sidebar-collapsed .calculator-page {
+  margin-left: 50px; /* Khoảng cách khi sidebar đóng */
+}
+
+/* .calculator-container {
+  max-width: 1000px; 
+  margin: auto;
+  padding: 30px;
+  font-family: sans-serif;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+} */
+
+.form-section {
+  max-width: 900px; /* Rộng hơn so với FoodRecognition */
+  margin: auto;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+}
+
+.form-section h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.4rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.calculate-btn {
+  width: 100%;
+  background-color: #10b981;
+  color: white;
+  font-weight: bold;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
+.calculate-btn:hover {
+  background-color: #059669;
+}
+
+.results-section {
+  max-width: 900px;
+  margin: 2rem auto 0;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+}
+
+.results-section h3 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+.results-card {
+  font-size: 1rem;
+  color: #4b5563;
+  line-height: 1.5;
+}

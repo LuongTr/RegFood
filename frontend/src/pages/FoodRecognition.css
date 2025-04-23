@@ -13,8 +13,13 @@
     background-color: #f8f9fa;
     min-height: 100vh;
     padding: 2rem;
+    transition: margin-left 0.3s ease; /* Thêm hiệu ứng chuyển đổi */
+    margin-left: 250px; /* Khoảng cách khi sidebar mở rộng */
   }
   
+  body.sidebar-collapsed .page-container {
+    margin-left: 50px; /* Khoảng cách khi sidebar đóng */
+  }
   
   .title {
     text-align: center;
@@ -111,4 +116,3 @@
     font-size: 20px;
     margin-top: 5px;
   }
-  

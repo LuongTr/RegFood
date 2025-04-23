@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Sidebar.css";
 import {
   FaHome,
@@ -15,7 +15,17 @@ import { Link, useLocation } from "react-router-dom";
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const toggleSidebar = () => setCollapsed(!collapsed);
-  const location = useLocation(); // for active highlighting
+
+  const location = useLocation();
+
+  // Thêm class vào body dựa trên trạng thái collapsed
+  useEffect(() => {
+    if (collapsed) {
+      document.body.classList.add("sidebar-collapsed");
+    } else {
+      document.body.classList.remove("sidebar-collapsed");
+    }
+  }, [collapsed]);
 
   return (
     <div className={`sidebar ${collapsed ? "collapsed" : ""}`}>
