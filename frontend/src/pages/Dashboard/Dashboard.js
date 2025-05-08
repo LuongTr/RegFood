@@ -64,12 +64,16 @@ const Dashboard = () => {
               <div key={meal.id} className="meal-card">
                 <img src={meal.image} alt={meal.name} className="meal-image" />
                 <div className="meal-info">
-                  <div className="meal-header">
-                    <h3>{meal.type}</h3>
-                    <span className="meal-time">{meal.time}</span>
+                  <div className="meal-details">
+                    <div className="meal-header">
+                      <h3>{meal.type}</h3>
+                      <p className="meal-name">{meal.name}</p>
+                    </div>
                   </div>
-                  <p className="meal-name">{meal.name}</p>
-                  <p className="meal-calories">{meal.calories} kcal</p>
+                  <div style={{ textAlign: 'right' }}>
+                    <p className="meal-time">{meal.time}</p>
+                    <p className="meal-calories">{meal.calories} kcal</p>
+                  </div>
                 </div>
               </div>
             ))}
