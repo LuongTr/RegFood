@@ -1,0 +1,261 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+@import url('https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css');
+
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #c9d6ff;
+    font-family: 'Poppins', sans-serif;
+}
+
+.login-page * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+    list-style: none;
+}
+
+.container {
+    position: relative;
+    width: 1000px;
+    height: 600px;
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.6s ease-in-out;
+}
+
+.form-section {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.6s ease-in-out;
+}
+
+.login {
+    left: 0;
+    opacity: 1;
+    z-index: 2;
+}
+
+.register {
+    left: 0;
+    opacity: 0;
+    z-index: 1;
+}
+
+.container.login-mode .login {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+.container.login-mode .register {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+}
+
+.container.login-mode .blue-section {
+    transform: translateX(-100%);
+    border-radius: 0 150px 150px 0;
+}
+
+.form-section h1 {
+    font-size: 42px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 40px;
+}
+
+.input-box {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.input-box input {
+    width: 100%;
+    padding: 16px 45px 16px 20px;
+    background: #f8f8f8;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.input-box input:focus {
+    background: #f1f1f1;
+    outline: none;
+}
+
+.input-box input::placeholder {
+    color: #999;
+}
+
+.input-box i {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    opacity: 0.5;
+}
+
+.forgot-password {
+    text-align: right;
+    margin: -10px 0 20px;
+}
+
+.forgot-password a {
+    color: #666;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+.forgot-password a:hover {
+    color: #7494ec;
+}
+
+.btn {
+    width: 100%;
+    padding: 16px;
+    background: #7494ec;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    background: #5f7fd8;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(116, 148, 236, 0.3);
+}
+
+.social-text {
+    text-align: center;
+    color: #666;
+    margin: 24px 0;
+    font-size: 14px;
+}
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.social-icons a {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.social-icons a:hover {
+    color: #7494ec;
+    border-color: #7494ec;
+    transform: translateY(-2px);
+}
+
+.blue-section {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(135deg, #7494ec, #5f7fd8);
+    border-radius: 150px 0 0 150px;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    transition: all 0.6s ease-in-out;
+}
+
+.blue-section h1 {
+    font-size: 42px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.blue-section p {
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+
+.blue-section .btn {
+    background: transparent;
+    border: 2px solid white;
+    width: auto;
+    padding: 12px 45px;
+}
+
+.blue-section .btn:hover {
+    background: white;
+    color: #7494ec;
+}
+
+@media (max-width: 1050px) {
+    .container {
+        width: 90%;
+        height: auto;
+        min-height: 800px;
+        margin: 20px;
+    }
+
+    .form-section {
+        position: relative;
+        width: 100%;
+        padding: 40px;
+    }
+
+    .blue-section {
+        position: relative;
+        width: 100%;
+        left: 0;
+        border-radius: 0;
+    }
+
+    .container.login-mode .blue-section,
+    .container.login-mode .login,
+    .container.login-mode .register {
+        transform: none;
+    }
+
+    .register {
+        opacity: 1;
+        z-index: 5;
+    }
+}
+
+.error-message {
+  color: red;
+  margin: 10px 0;
+  font-size: 14px;
+}
+
+.success-message {
+  color: green;
+  margin: 10px 0;
+  font-size: 14px;
+}

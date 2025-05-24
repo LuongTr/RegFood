@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 
 // Load environment variables
 dotenv.config();
@@ -12,6 +13,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Configure static file serving for uploads
+console.log('Uploads directory:', path.join(__dirname, 'uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // MongoDB Connection with updated options
 mongoose.connect(process.env.MONGODB_URI, {
@@ -26,12 +31,17 @@ mongoose.connect(process.env.MONGODB_URI, {
   process.exit(1);
 });
 
+
 // Routes
 app.use('/api/auth', require('./src/routes/authRoutes'));
 app.use('/api/users', require('./src/routes/userRoutes'));
 app.use('/api/meals', require('./src/routes/mealRoutes'));
 app.use('/api/water', require('./src/routes/waterRoutes'));
 app.use('/api/food', require('./src/routes/foodRoutes'));
+app.use('/api/diet-recommender', require('./src/routes/dietRecommenderRoutes'));
+// Handle both /api/foods and /api/food routes
+app.use('/api/foods', require('./src/routes/foodListRoutes'));
+app.use('/api/food', require('./src/routes/foodListRoutes')); // Backwards compatibility
 
 // Basic error handling
 app.use((err, req, res, next) => {

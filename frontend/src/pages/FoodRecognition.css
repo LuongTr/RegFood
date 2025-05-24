@@ -116,3 +116,68 @@
     font-size: 20px;
     margin-top: 5px;
   }
+
+  .loading-state {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+  }
+  
+  .error-state {
+    text-align: center;
+    padding: 20px;
+    color: #dc3545;
+    background-color: #f8d7da;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  
+  .no-nutrition {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .per-100g {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+  }
+
+  .result-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .primary-result {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .alternative-results {
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 8px;
+  }
+  
+  .alternatives-label {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+  }
+  
+  .alternative-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+  }
+  
+  .alt-confidence {
+    color: #666;
+    font-size: 14px;
+  }

@@ -6,17 +6,21 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
+import Login from "./pages/auth/Login";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import FoodRecognition from "./pages/FoodRecognition";
 import CalorieCalculator from "./pages/Calculator/Calculator";
 import NutritionTracking from "./pages/NutritionTracking/NutritionTracking";
 import Settings from "./pages/Settings/Settings";
+import DietRecommender from "./pages/DietRecommender/DietRecommender";
+import Foods from "./pages/Foods/Foods";
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
   const { token } = useAuth();
   if (!token) {
     return <Navigate to="/signin" />;
+    // return <Navigate to="/login" />;
   }
   return children;
 };
@@ -55,6 +59,16 @@ function AppContent() {
         <Route path="/settings" element={
           <ProtectedRoute>
             <Settings />
+          </ProtectedRoute>
+        } />
+        <Route path="/diet-recommender" element={
+          <ProtectedRoute>
+            <DietRecommender />
+          </ProtectedRoute>
+        } />
+        <Route path="/foods" element={
+          <ProtectedRoute>
+            <Foods />
           </ProtectedRoute>
         } />
       </Routes>

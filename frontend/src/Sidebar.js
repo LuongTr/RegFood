@@ -9,6 +9,7 @@ import {
   FaUtensils,
   FaAngleLeft,
   FaAngleRight,
+  FaList,
 } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
 
@@ -55,6 +56,14 @@ const Sidebar = () => {
       <Link to="/nutrition-tracking" className={`nav-item ${location.pathname === "/nutrition-tracking" ? "active" : ""}`}>
         <FaChartLine className="icon" />
         {!collapsed && <span>Nutrition Tracking</span>}
+      </Link>      <Link to="/diet-recommender" className={`nav-item ${location.pathname === "/diet-recommender" ? "active" : ""}`}>
+        <FaUtensils className="icon" />
+        {!collapsed && <span>Diet Recommender</span>}
+      </Link>
+
+      <Link to="/foods" className={`nav-item ${location.pathname === "/foods" ? "active" : ""}`}>
+        <FaList className="icon" />
+        {!collapsed && <span>Food Database</span>}
       </Link>
 
       <Link to="/settings" className={`nav-item ${location.pathname === "/settings" ? "active" : ""}`}>
