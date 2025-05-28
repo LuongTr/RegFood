@@ -14,6 +14,8 @@ const upload = multer({
   }
 });
 
+// Modified to work with specific route registration in server.js
+
 // Recognize food from image
 router.post('/recognize', auth, upload.single('image'), async (req, res) => {
   try {

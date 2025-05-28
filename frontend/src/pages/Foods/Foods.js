@@ -25,6 +25,10 @@ const Foods = () => {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [showAddForm, setShowAddForm] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [currentFoodId, setCurrentFoodId] = useState(null);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [foodToDelete, setFoodToDelete] = useState(null);
     const [newFood, setNewFood] = useState({
         name: '',
         category: 'Snacks', // Default category
@@ -60,12 +64,14 @@ const Foods = () => {
         fetchFoods();
 
         return () => observer.disconnect();
-    }, []);    const fetchFoods = async () => {
+    }, []);    
+        const fetchFoods = async () => {
         try {
             console.log('Start fetching foods...');
             setLoading(true);
             setError(null);
-            const token = localStorage.getItem('token');            const response = await axios.get('/api/foods/', {
+            const token = localStorage.getItem('token');            
+            const response = await axios.get('/api/foods/', {
                 baseURL: 'http://localhost:5000',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -154,7 +160,147 @@ const Foods = () => {
         } finally {
             setLoading(false);
         }
-    };    const handleInputChange = (e, field) => {
+    };    const handleEditFood = (food) => {
+        setIsEditing(true);
+        setCurrentFoodId(food._id);
+        // Populate the form with the current food data
+        setNewFood({
+            name: food.name,
+            category: food.category || 'Main Course',
+            nutrition: {
+                calories: food.nutritionPer100g?.calories || '',
+                protein: food.nutritionPer100g?.protein || '',
+                carbs: food.nutritionPer100g?.carbs || '',
+                fat: food.nutritionPer100g?.fat || '',
+                fiber: food.nutritionPer100g?.fiber || '0'
+            },
+            dietaryPreferences: food.dietaryPreferences || [],
+            mealType: food.mealType || [],
+            servingSize: food.servingSize || '100',
+            servingUnit: food.servingUnit || 'g',
+            description: food.description || '',
+            preparationTime: food.preparationTime || '0',
+            image: food.image || ''
+        });
+        setShowAddForm(true);
+    };    const handleUpdateFood = async (e) => {
+        e.preventDefault();
+        try {
+            setLoading(true);
+            const token = localStorage.getItem('token');
+            
+            const formData = new FormData();
+            if (newFood.image && typeof newFood.image !== 'string') {
+                formData.append('image', newFood.image);
+            }
+            
+            console.log('Updating food data:', newFood);
+            
+            formData.append('foodData', JSON.stringify({
+                name: newFood.name,
+                category: newFood.category || "Main Course",
+                servingSize: parseInt(newFood.servingSize) || 100,
+                servingUnit: newFood.servingUnit || "g",
+                nutritionPer100g: {
+                    calories: parseInt(newFood.nutrition.calories) || 0,
+                    protein: parseInt(newFood.nutrition.protein) || 0,
+                    carbs: parseInt(newFood.nutrition.carbs) || 0,
+                    fat: parseInt(newFood.nutrition.fat) || 0,
+                    fiber: parseInt(newFood.nutrition.fiber) || 0
+                },
+                mealType: newFood.mealType && newFood.mealType.length > 0 ? newFood.mealType : ['lunch'],
+                dietaryPreferences: newFood.dietaryPreferences || [],
+                description: newFood.description || '',
+                preparationTime: parseInt(newFood.preparationTime) || 0
+            }));            // Use the PUT endpoint to update the existing food
+            const response = await axios.put(`/api/foods/${currentFoodId}`, formData, {
+                baseURL: 'http://localhost:5000',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+              if (response.data && response.data.success) {
+                // Update the foods array with the updated item
+                const updatedFoods = foods.map(food => 
+                    food._id === currentFoodId ? response.data.data : food
+                );
+                
+                // Sort foods by name for better organization
+                updatedFoods.sort((a, b) => a.name.localeCompare(b.name));
+                
+                setFoods(updatedFoods);
+                setShowAddForm(false);
+                setIsEditing(false);
+                setCurrentFoodId(null);
+                resetForm();
+                
+                console.log("Successfully updated food item");
+            }
+        } catch (err) {
+            console.error('Error updating food:', err);
+            console.error('Error response:', err.response?.data);
+            setError(err.response?.data?.message || 'Error updating food');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDeleteConfirm = (food) => {
+        setFoodToDelete(food);
+        setShowDeleteConfirm(true);
+    };    const handleDeleteFood = async () => {
+        try {
+            setLoading(true);
+            
+            const token = localStorage.getItem('token');
+            
+            const response = await axios.delete(`/api/foods/${foodToDelete._id}`, {
+                baseURL: 'http://localhost:5000',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (response.data && response.data.success) {
+                // Remove the deleted food from the foods array
+                const updatedFoods = foods.filter(food => food._id !== foodToDelete._id);
+                setFoods(updatedFoods);
+                setShowDeleteConfirm(false);
+                setFoodToDelete(null);
+                console.log("Successfully deleted food item");
+            }
+        } catch (err) {
+            console.error('Error deleting food:', err);
+            console.error('Error response:', err.response?.data);
+            setError(err.response?.data?.message || 'Error deleting food');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const resetForm = () => {
+        setNewFood({
+            name: '',
+            category: 'Snacks',
+            nutrition: {
+                calories: '',
+                protein: '',
+                carbs: '',
+                fat: '',
+                fiber: '0'
+            },
+            dietaryPreferences: [],
+            mealType: [],
+            servingSize: '100',
+            servingUnit: 'g',
+            description: '',
+            preparationTime: '0',
+            image: ''
+        });
+    };
+
+    const handleInputChange = (e, field) => {
         if (field.includes('nutrition.')) {
             const nutritionField = field.split('.')[1];
             setNewFood({
@@ -245,8 +391,8 @@ const Foods = () => {
                 {showAddForm && (
                     <div className="modal-overlay">
                         <div className="add-food-form">
-                            <h3>Add New Food</h3>
-                            <form onSubmit={handleAddFood}>
+                            <h3>{isEditing ? 'Edit Food' : 'Add New Food'}</h3>
+                            <form onSubmit={isEditing ? handleUpdateFood : handleAddFood}>
                                 <div className="form-group">
                                     <label>Name:</label>
                                     <input
@@ -463,7 +609,7 @@ const Foods = () => {
                                 </div>
                                 <div className="form-actions">
                                     <div className="button-container">
-                                        <button type="submit" className="submit-btn">Add Food</button>
+                                        <button type="submit" className="submit-btn">{isEditing ? 'Update Food' : 'Add Food'}</button>
                                         <button 
                                             type="button" 
                                             className="cancel-btn"
@@ -484,25 +630,41 @@ const Foods = () => {
                     <div className="error-message">
                         {error}
                     </div>
-                )}                
+                )}                  
                 {!loading && !error && (
                     <div className="foods-grid">                        
                     {filteredFoods.map((food) => (
                             <div key={food._id} className="food-card">
-                                {food.image ? (
-                                    <img 
-                                        src={getImageUrl(food.image)}
-                                        alt={food.name} 
-                                        className="food-image" 
-                                        onError={(e) => {
-                                            console.log('Image failed to load:', food.image);
-                                            e.target.onerror = null;
-                                            e.target.src = 'https://via.placeholder.com/200x200?text=No+Image';
-                                        }}
-                                    />
-                                ) : (
-                                    <div className="no-image-placeholder">No Image Available</div>
-                                )}
+                                <div className="food-image-container">
+                                    {food.image ? (
+                                        <img 
+                                            src={getImageUrl(food.image)}
+                                            alt={food.name} 
+                                            className="food-image" 
+                                            onError={(e) => {
+                                                console.log('Image failed to load:', food.image);
+                                                e.target.onerror = null;
+                                                e.target.src = 'https://via.placeholder.com/200x200?text=No+Image';
+                                            }}
+                                        />
+                                    ) : (
+                                        <div className="no-image-placeholder">No Image Available</div>
+                                    )}
+                                    <div className="food-actions-overlay">
+                                        <button 
+                                            className="edit-btn"
+                                            onClick={() => handleEditFood(food)}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button 
+                                            className="delete-btn"
+                                            onClick={() => handleDeleteConfirm(food)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
                                 <h3 className="food-name">{food.name}</h3>
                                 <div className="nutrition-info">
                                     <p>
@@ -569,14 +731,36 @@ const Foods = () => {
                                                 </span>
                                             );
                                         })}
-                                    </div>
+                                    </div>                                
                                 )}
-
                             </div>
                         ))}
                     </div>
                 )}
             </div>
+
+            {showDeleteConfirm && foodToDelete && (
+                <div className="modal-overlay">
+                    <div className="confirm-delete">
+                        <h3>Confirm Delete</h3>
+                        <p>Are you sure you want to delete "{foodToDelete.name}" from the database?</p>
+                        <div className="button-container">
+                            <button 
+                                className="confirm-delete-btn"
+                                onClick={handleDeleteFood}
+                            >
+                                Yes, Delete
+                            </button>
+                            <button 
+                                className="cancel-delete-btn"
+                                onClick={() => setShowDeleteConfirm(false)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

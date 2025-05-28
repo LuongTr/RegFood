@@ -37,11 +37,17 @@ app.use('/api/auth', require('./src/routes/authRoutes'));
 app.use('/api/users', require('./src/routes/userRoutes'));
 app.use('/api/meals', require('./src/routes/mealRoutes'));
 app.use('/api/water', require('./src/routes/waterRoutes'));
-app.use('/api/food', require('./src/routes/foodRoutes'));
 app.use('/api/diet-recommender', require('./src/routes/dietRecommenderRoutes'));
-// Handle both /api/foods and /api/food routes
-app.use('/api/foods', require('./src/routes/foodListRoutes'));
-app.use('/api/food', require('./src/routes/foodListRoutes')); // Backwards compatibility
+// Food routes - special handling to avoid conflicts
+const foodListRoutes = require('./src/routes/foodListRoutes');
+
+// First register the foodListRoutes for complete CRUD operations
+// This handles GET, POST, PUT, DELETE for /api/foods
+app.use('/api/foods', foodListRoutes);
+
+// For specific food operations from foodRoutes.js
+const foodRecognizeRoutes = require('./src/routes/foodRoutes');
+app.use('/api/food', foodRecognizeRoutes);
 
 // Basic error handling
 app.use((err, req, res, next) => {
