@@ -64,6 +64,8 @@
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    padding: 20px;
+    overflow-y: auto;
 }
 
 .add-food-form {
@@ -72,12 +74,52 @@
     border-radius: 8px;
     width: 100%;
     max-width: 500px;
+    max-height: 800px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
+
+.add-food-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: calc(800px - 4rem);
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.add-food-form::-webkit-scrollbar,
+.add-food-form form::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.add-food-form::-webkit-scrollbar-track,
+.add-food-form form::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.add-food-form::-webkit-scrollbar-thumb,
+.add-food-form form::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
+
+.add-food-form::-webkit-scrollbar-thumb:hover,
+.add-food-form form::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
 }
 
 .add-food-form h3 {
     margin: 0 0 1.5rem;
     color: #333;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: white;
+    padding-bottom: 1rem;
+    margin-top: 0;
 }
 
 .form-group {
@@ -101,6 +143,11 @@
     display: flex;
     justify-content: center;
     margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding-top: 1rem;
 }
 
 .button-container {
@@ -244,6 +291,37 @@
     color: #333;
 }
 
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"] {
+    margin-right: 6px;
+}
+
+.serving-inputs {
+    display: flex;
+    gap: 10px;
+}
+
+.serving-size-input {
+    flex: 1;
+}
+
+.serving-unit-input {
+    width: 70px;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .foods-grid {
@@ -264,4 +342,97 @@
     .foods-grid {
         grid-template-columns: 1fr;
     }
+    
+    .add-food-form {
+        padding: 1.5rem;
+        max-height: 90vh;
+    }
+    
+    .form-group label {
+        font-size: 14px;
+    }
+}
+
+@media (max-height: 900px) {
+    .add-food-form {
+        max-height: 90vh;
+    }
+    
+    .add-food-form form {
+        max-height: calc(80vh - 4rem);
+    }
+}
+
+.food-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.tag {
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: inline-block;
+  text-transform: capitalize;
+}
+
+.meal-tag {
+  border-radius: 12px;
+}
+
+.dietary-tag {
+  border-radius: 8px;
+}
+
+/* Individual tag styles for food Pref */
+.dietary-tag.vegetarian {
+  background-color: #4caf50; /* green */
+}
+
+.dietary-tag.vegan {
+  background-color: #8bc34a; /* light green */
+}
+
+.dietary-tag.gluten-free {
+  background-color: #ff9800; /* orange */
+}
+
+.dietary-tag.dairy-free {
+  background-color: #03a9f4; /* blue */
+}
+
+.dietary-tag.low-carb {
+  background-color: #9c27b0; /* purple */
+}
+
+.dietary-tag.high-protein {
+  background-color: #f44336; /* red */
+}
+
+/* Individual tag styles for Meal type */
+.meal-tag.breakfast {
+  background-color: #FFF4D4  ; 
+  color: #8A6A00 ;
+}
+
+.meal-tag.lunch {
+  background-color: #FFD36E  ; 
+  color: #3F2D00 ;
+}
+
+.meal-tag.dinner {
+  background-color: #4B1D3F  ; 
+  color: #FFFFFF ;
+}
+
+.meal-tag.snack {
+  background-color: #E0F7EC  ; 
+  color: #216B5E ;
+}
+
+.tag-icon {
+  display: inline-block;
+  vertical-align: middle;
 }

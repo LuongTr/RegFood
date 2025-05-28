@@ -27,12 +27,20 @@ const Foods = () => {
     const [showAddForm, setShowAddForm] = useState(false);
     const [newFood, setNewFood] = useState({
         name: '',
+        category: 'Snacks', // Default category
         nutrition: {
             calories: '',
             protein: '',
             carbs: '',
-            fat: ''
+            fat: '',
+            fiber: '0'
         },
+        dietaryPreferences: [], // Array to store dietary preferences
+        mealType: [], // Array to store meal types
+        servingSize: '100',
+        servingUnit: 'g',
+        description: '',
+        preparationTime: '0',
         image: ''
     });
 
@@ -89,11 +97,25 @@ const Foods = () => {
             const formData = new FormData();
             if (newFood.image) {
                 formData.append('image', newFood.image);
-            }
+            }            // Log what we're sending for debugging
+            console.log('Sending food data:', newFood);
+            
             formData.append('foodData', JSON.stringify({
                 name: newFood.name,
-                category: '',
-                nutrition: newFood.nutrition
+                category: "Main Course", // Since category is commented out in the form, provide a default
+                servingSize: parseInt(newFood.servingSize) || 100,
+                servingUnit: newFood.servingUnit || "g",
+                nutritionPer100g: {
+                    calories: parseInt(newFood.nutrition.calories) || 0,
+                    protein: parseInt(newFood.nutrition.protein) || 0,
+                    carbs: parseInt(newFood.nutrition.carbs) || 0,
+                    fat: parseInt(newFood.nutrition.fat) || 0,
+                    fiber: parseInt(newFood.nutrition.fiber) || 0
+                },
+                mealType: newFood.mealType && newFood.mealType.length > 0 ? newFood.mealType : ['lunch'],
+                dietaryPreferences: newFood.dietaryPreferences || [],
+                description: newFood.description || '',
+                preparationTime: parseInt(newFood.preparationTime) || 0
             }));
             
             const response = await axios.post('/api/foods', formData, {
@@ -109,16 +131,25 @@ const Foods = () => {
                 setShowAddForm(false);
                 setNewFood({
                     name: '',
+                    category: 'Snacks', // Default category
                     nutrition: {
                         calories: '',
                         protein: '',
                         carbs: '',
-                        fat: ''
+                        fat: '',
+                        fiber: '0'
                     },
+                    dietaryPreferences: [], // Array to store dietary preferences
+                    mealType: [], // Array to store meal types
+                    servingSize: '100',
+                    servingUnit: 'g',
+                    description: '',
+                    preparationTime: '0',
                     image: ''
                 });
-            }
-        } catch (err) {
+            }        } catch (err) {
+            console.error('Error in handleAddFood:', err);
+            console.error('Error response:', err.response?.data);
             setError(err.response?.data?.message || 'Error adding food');
         } finally {
             setLoading(false);
@@ -148,6 +179,40 @@ const Foods = () => {
                 ...newFood,
                 image: file
             });
+        }
+    };
+
+    const handleCheckboxChange = (e, type, value) => {
+        const isChecked = e.target.checked;
+        
+        if (type === 'dietaryPreferences') {
+            if (isChecked) {
+                // Add the preference if checked
+                setNewFood({
+                    ...newFood,
+                    dietaryPreferences: [...newFood.dietaryPreferences, value]
+                });
+            } else {
+                // Remove the preference if unchecked
+                setNewFood({
+                    ...newFood,
+                    dietaryPreferences: newFood.dietaryPreferences.filter(pref => pref !== value)
+                });
+            }
+        } else if (type === 'mealType') {
+            if (isChecked) {
+                // Add the meal type if checked
+                setNewFood({
+                    ...newFood,
+                    mealType: [...newFood.mealType, value]
+                });
+            } else {
+                // Remove the meal type if unchecked
+                setNewFood({
+                    ...newFood,
+                    mealType: newFood.mealType.filter(meal => meal !== value)
+                });
+            }
         }
     };
 
@@ -191,6 +256,21 @@ const Foods = () => {
                                         required
                                     />
                                 </div>
+                                {/* <div className="form-group">
+                                    <label>Category:</label>
+                                    <select
+                                        value={newFood.category}
+                                        onChange={(e) => handleInputChange(e, 'category')}
+                                        required
+                                    >
+                                        <option value="Breakfast">Breakfast</option>
+                                        <option value="Main Course">Main Course</option>
+                                        <option value="Snacks">Snacks</option>
+                                        <option value="Dessert">Dessert</option>
+                                        <option value="Beverage">Beverage</option>
+                                        <option value="Side Dish">Side Dish</option>
+                                    </select>
+                                </div> */}
                                 <div className="form-group">
                                     <label>Calories:</label>
                                     <input
@@ -217,7 +297,7 @@ const Foods = () => {
                                         onChange={(e) => handleInputChange(e, 'nutrition.carbs')}
                                         required
                                     />
-                                </div>
+                                </div>                                
                                 <div className="form-group">
                                     <label>Fat (g):</label>
                                     <input
@@ -226,7 +306,52 @@ const Foods = () => {
                                         onChange={(e) => handleInputChange(e, 'nutrition.fat')}
                                         required
                                     />
-                                </div>                                <div className="form-group">
+                                </div>
+                                {/* <div className="form-group">
+                                    <label>Fiber (g):</label>
+                                    <input
+                                        type="number"
+                                        value={newFood.nutrition.fiber}
+                                        onChange={(e) => handleInputChange(e, 'nutrition.fiber')}
+                                    />
+                                </div> */}
+                                <div className="form-group">
+                                    <label>Description:</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Brief description of the food"
+                                        value={newFood.description}
+                                        onChange={(e) => handleInputChange(e, 'description')}
+                                    />
+                                </div>
+                                {/* <div className="form-group">
+                                    <label>Preparation Time (minutes):</label>
+                                    <input
+                                        type="number"
+                                        value={newFood.preparationTime}
+                                        onChange={(e) => handleInputChange(e, 'preparationTime')}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Serving Size:</label>
+                                    <div className="serving-inputs">
+                                        <input
+                                            type="number"
+                                            value={newFood.servingSize}
+                                            onChange={(e) => handleInputChange(e, 'servingSize')}
+                                            placeholder="100"
+                                            className="serving-size-input"
+                                        />
+                                        <input
+                                            type="text"
+                                            value={newFood.servingUnit}
+                                            onChange={(e) => handleInputChange(e, 'servingUnit')}
+                                            placeholder="g, ml, etc."
+                                            className="serving-unit-input"
+                                        />
+                                    </div>
+                                </div> */}
+                                <div className="form-group">
                                     <label>Food Image:</label>
                                     <div className="image-upload-container">
                                         <input
@@ -244,6 +369,96 @@ const Foods = () => {
                                                 <img src={typeof newFood.image === 'string' ? newFood.image : URL.createObjectURL(newFood.image)} alt="Preview" />
                                             </div>
                                         )}
+                                    </div>
+                                </div>                                
+                                <div className="form-group">
+                                    <label>Dietary Preferences:</label>
+                                    <div className="checkbox-group">
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={newFood.dietaryPreferences.includes('vegetarian')}
+                                                onChange={(e) => handleCheckboxChange(e, 'dietaryPreferences', 'vegetarian')}
+                                            />
+                                            Vegetarian
+                                        </label>
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={newFood.dietaryPreferences.includes('vegan')}
+                                                onChange={(e) => handleCheckboxChange(e, 'dietaryPreferences', 'vegan')}
+                                            />
+                                            Vegan
+                                        </label>
+                                        <label>
+                                            <input
+                                                type="checkbox"                                   
+                                                checked={newFood.dietaryPreferences.includes('gluten-free')}
+                                                onChange={(e) => handleCheckboxChange(e, 'dietaryPreferences', 'gluten-free')}
+                                            />
+                                            Gluten Free
+                                        </label>
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={newFood.dietaryPreferences.includes('dairy-free')}
+                                                onChange={(e) => handleCheckboxChange(e, 'dietaryPreferences', 'dairy-free')}
+                                            />
+                                            Dairy Free
+                                        </label>
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={newFood.dietaryPreferences.includes('low-carb')}
+                                                onChange={(e) => handleCheckboxChange(e, 'dietaryPreferences', 'low-carb')}
+                                            />
+                                            Low Carb
+                                        </label>
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={newFood.dietaryPreferences.includes('high-protein')}
+                                                onChange={(e) => handleCheckboxChange(e, 'dietaryPreferences', 'high-protein')}
+                                            />
+                                            High Protein
+                                        </label>
+                                    </div>
+                                </div>                                
+                                <div className="form-group">
+                                    <label>Meal Type:</label>
+                                    <div className="checkbox-group">
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={newFood.mealType.includes('breakfast')}
+                                                onChange={(e) => handleCheckboxChange(e, 'mealType', 'breakfast')}
+                                            />
+                                            Breakfast
+                                        </label>
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={newFood.mealType.includes('lunch')}
+                                                onChange={(e) => handleCheckboxChange(e, 'mealType', 'lunch')}
+                                            />
+                                            Lunch
+                                        </label>
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={newFood.mealType.includes('dinner')}
+                                                onChange={(e) => handleCheckboxChange(e, 'mealType', 'dinner')}
+                                            />
+                                            Dinner
+                                        </label>
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={newFood.mealType.includes('snack')}
+                                                onChange={(e) => handleCheckboxChange(e, 'mealType', 'snack')}
+                                            />
+                                            Snack
+                                        </label>
                                     </div>
                                 </div>
                                 <div className="form-actions">
@@ -269,8 +484,10 @@ const Foods = () => {
                     <div className="error-message">
                         {error}
                     </div>
-                )}                {!loading && !error && (
-                    <div className="foods-grid">                        {filteredFoods.map((food) => (
+                )}                
+                {!loading && !error && (
+                    <div className="foods-grid">                        
+                    {filteredFoods.map((food) => (
                             <div key={food._id} className="food-card">
                                 {food.image ? (
                                     <img 
@@ -299,12 +516,62 @@ const Foods = () => {
                                     <p>
                                         <span className="label">Carbs:</span>
                                         <span className="value">{food.nutritionPer100g?.carbs || '-'}g</span>
-                                    </p>
-                                    <p>
+                                    </p>                                    <p>
                                         <span className="label">Fat:</span>
                                         <span className="value">{food.nutritionPer100g?.fat || '-'}g</span>
                                     </p>
+                                    {/* {food.nutritionPer100g?.fiber > 0 && (
+                                    <p>
+                                        <span className="label">Fiber:</span>
+                                        <span className="value">{food.nutritionPer100g?.fiber || '-'}g</span>
+                                    </p>
+                                    )} */}
                                 </div>
+                                
+                                {food.dietaryPreferences && food.dietaryPreferences.length > 0 && (
+                                    <div className="food-tags dietary-tags">
+                                        {food.dietaryPreferences.map((pref, index) => (
+                                        <span key={index} className={`tag dietary-tag ${pref.toLowerCase().replace(/\s/g, '-')}`}>
+                                            {pref}
+                                        </span>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {food.mealType && food.mealType.length > 0 && (
+                                    <div className="food-tags meal-tags">
+                                        {food.mealType.map((type, index) => {
+                                            let icon = '';
+
+                                            switch (type.toLowerCase()) {
+                                                case 'breakfast':
+                                                icon = '🕖';
+                                                break;
+                                                case 'lunch':
+                                                icon = '🕛';
+                                                break;
+                                                case 'dinner':
+                                                icon = '🕔';
+                                                break;
+                                                case 'snack':
+                                                icon = '🕘';        
+                                                break;
+                                                default:
+                                                icon = '🕒';
+                                            }
+                                            return (
+                                                <span
+                                                    key={index}
+                                                    className={`tag meal-tag ${type.toLowerCase().replace(/\s/g, '-')}`}
+                                                >
+                                                    <span className="tag-icon" style={{ marginRight: '6px' }}>{icon}</span>
+                                                    {type}
+                                                </span>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+
                             </div>
                         ))}
                     </div>

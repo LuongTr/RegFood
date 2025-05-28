@@ -68,9 +68,12 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Add new food with image upload
-router.post('/', auth, upload.single('image'), async (req, res) => {    try {
+router.post('/', auth, upload.single('image'), async (req, res) => {    
+    try {
         console.log('Received file:', req.file);
+        console.log('Received body:', req.body);
         const foodData = JSON.parse(req.body.foodData);
+        console.log('Parsed food data:', foodData);
         let imagePath = null;
         
         if (req.file) {
@@ -81,19 +84,39 @@ router.post('/', auth, upload.single('image'), async (req, res) => {    try {
             // If no file uploaded but a valid URL is provided
             imagePath = foodData.imageUrl;
             console.log('Using provided image URL:', imagePath);
+        }// Create nutrition object safely
+        const nutrition = {
+            calories: 0,
+            protein: 0,
+            carbs: 0,
+            fat: 0,
+            fiber: 0
+        };
+        
+        // Check if nutritionPer100g exists and populate values
+        if (foodData.nutritionPer100g) {
+            nutrition.calories = Number(foodData.nutritionPer100g.calories || 0);
+            nutrition.protein = Number(foodData.nutritionPer100g.protein || 0);
+            nutrition.carbs = Number(foodData.nutritionPer100g.carbs || 0);
+            nutrition.fat = Number(foodData.nutritionPer100g.fat || 0);
+            nutrition.fiber = Number(foodData.nutritionPer100g.fiber || 0);
         }
-
+        
         const newFood = new FoodDatabase({
             name: foodData.name,
-            category: foodData.category || "",
-            servingSize: 100,
-            servingUnit: 'g',
-            nutritionPer100g: {
-                calories: Number(foodData.nutrition.calories),
-                protein: Number(foodData.nutrition.protein),
-                carbs: Number(foodData.nutrition.carbs),
-                fat: Number(foodData.nutrition.fat)
-            },            // Store the image path/url in one field
+            category: foodData.category || "Main Course",
+            servingSize: Number(foodData.servingSize || 100),
+            servingUnit: foodData.servingUnit || 'g',
+            nutritionPer100g: nutrition,
+            mealType: Array.isArray(foodData.mealType) && foodData.mealType.length > 0 
+                ? foodData.mealType 
+                : ['lunch', 'dinner'],
+            dietaryPreferences: Array.isArray(foodData.dietaryPreferences) 
+                ? foodData.dietaryPreferences 
+                : [],
+            description: foodData.description || '',
+            preparationTime: Number(foodData.preparationTime || 0),
+            // Store the image path/url in one field
             image: imagePath
         });
 
@@ -102,13 +125,22 @@ router.post('/', auth, upload.single('image'), async (req, res) => {    try {
         res.json({
             success: true,
             data: newFood
-        });
-    } catch (error) {
+        });    } catch (error) {
         console.error('Error adding food:', error);
+        
+        // More detailed error message
+        let errorMessage = 'Error adding food';
+        if (error instanceof SyntaxError) {
+            errorMessage = 'Invalid JSON data format';
+        } else if (error.name === 'ValidationError') {
+            errorMessage = Object.values(error.errors).map(e => e.message).join(', ');
+        }
+        
         res.status(500).json({ 
             success: false, 
-            message: 'Error adding food',
-            error: error.message 
+            message: errorMessage,
+            error: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }
 });

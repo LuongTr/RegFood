@@ -4,9 +4,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 
 import Sidebar from "./Sidebar";
 import Header from "./Header";
-import SignIn from "./pages/auth/SignIn";
-import SignUp from "./pages/auth/SignUp";
-import Login from "./pages/auth/Login";
+import AuthPage from "./pages/auth/AuthPage";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import FoodRecognition from "./pages/FoodRecognition";
 import CalorieCalculator from "./pages/Calculator/Calculator";
@@ -19,8 +17,7 @@ import Foods from "./pages/Foods/Foods";
 const ProtectedRoute = ({ children }) => {
   const { token } = useAuth();
   if (!token) {
-    return <Navigate to="/signin" />;
-    // return <Navigate to="/login" />;
+    return <Navigate to="/auth" />;
   }
   return children;
 };
@@ -33,8 +30,10 @@ function AppContent() {
       {token && <Header />}
       {token && <Sidebar />}
       <Routes>
-        <Route path="/signin" element={!token ? <SignIn /> : <Navigate to="/" />} />
-        <Route path="/signup" element={!token ? <SignUp /> : <Navigate to="/" />} />
+        <Route path="/auth" element={!token ? <AuthPage /> : <Navigate to="/" />} />
+        {/* Redirect older routes to new auth page */}
+        <Route path="/signin" element={<Navigate to="/auth" />} />
+        <Route path="/signup" element={<Navigate to="/auth" />} />
         
         <Route path="/" element={
           <ProtectedRoute>

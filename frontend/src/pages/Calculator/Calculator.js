@@ -53,6 +53,18 @@ const Calculator = () => {
       alert('Please fill in all fields');
       return;
     }
+    if (formData.age < 10 || formData.age > 150) {
+      alert('Age must be between 10 and 150');
+      return;
+    }
+    if (formData.height < 50 || formData.height > 300) {
+      alert('Height must be between 50 cm and 300 cm');
+      return;
+    }
+    if (formData.weight < 20 || formData.weight > 500) {  
+      alert('Weight must be between 20 kg and 500 kg');
+      return;
+    }
 
     // Calculate BMR
     const bmr = calculateBMR();
