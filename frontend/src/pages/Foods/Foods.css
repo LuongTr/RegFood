@@ -40,7 +40,7 @@
 }
 
 .add-food-btn {
-    background: #4CAF50;
+    background: #6c63ff;
     color: white;
     padding: 0.5rem 1rem;
     border: none;
@@ -50,7 +50,7 @@
 }
 
 .add-food-btn:hover {
-    background: #388E3C;
+    background: #5a52e0;
 }
 
 .modal-overlay {

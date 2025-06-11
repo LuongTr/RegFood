@@ -45,7 +45,8 @@ const DietRecommender = () => {
     const fetchRecommendations = async () => {
         try {
             setLoading(true);
-            setError(null);            const response = await axios.get(`/api/diet-recommender/recommendations`, {
+            setError(null);            
+            const response = await axios.get(`/api/diet-recommender/recommendations`, {
                 baseURL: 'http://localhost:5000',
                 params: {
                     maintenanceCalories,
@@ -108,9 +109,7 @@ const DietRecommender = () => {
                 </div>
             </div>
         );
-    };
-
-    const renderMealCard = (food) => (
+    };    const renderMealCard = (food) => (
         <div className="food-card">
             <div className="food-content">
                 <div className="food-main">
@@ -122,10 +121,10 @@ const DietRecommender = () => {
                     </div>
                 </div>
                 <div className="food-details">
-                    <span className="calories">{food.nutritionPer100g?.calories || 0} kcal</span>
-                    <span className="prep-time">⏱ {food.preparationTime || 30} mins</span>
+                    <span className="calories">🔥 {food.nutritionPer100g?.calories || 0} kcal</span>
+                    <span className="prep-time">⏱️ {food.preparationTime || 30} mins</span>
                 </div>
-                <p className="description">{food.description}</p>
+                <p className="description">{food.description || "Delicious and nutritious meal option."}</p>
             </div>
         </div>
     );
@@ -179,15 +178,14 @@ const DietRecommender = () => {
                 </div>
             )}            {recommendations && (
                 <div className="recommendations-container">
-                    <h2 className="plan-title">Daily Meal Plan ({maintenanceCalories} kcal)</h2>
-                    <div className="meal-list">
+                    <h2 className="plan-title">Daily Meal Plan ({maintenanceCalories} kcal)</h2>                    <div className="meal-list">
                         <div className="meal-section">
                             <div className="meal-header">
                                 <div>
-                                    <h3>Breakfast</h3>
+                                    <h3>🍳 Breakfast</h3>
                                     <span className="meal-time">7:00 - 8:30</span>
                                 </div>
-                                <div className="total-calories">Total: {recommendations.mealCalories.breakfast} kcal</div>
+                                <div className="total-calories">🔥 Total: {recommendations.mealCalories.breakfast} kcal</div>
                             </div>
                             <div className="food-grid">
                                 {recommendations.recommendations.breakfast?.map((food, index) => (
@@ -199,10 +197,10 @@ const DietRecommender = () => {
                         <div className="meal-section">
                             <div className="meal-header">
                                 <div>
-                                    <h3>Lunch</h3>
+                                    <h3>🍲 Lunch</h3>
                                     <span className="meal-time">12:00 - 13:30</span>
                                 </div>
-                                <div className="total-calories">Total: {recommendations.mealCalories.lunch} kcal</div>
+                                <div className="total-calories">🔥 Total: {recommendations.mealCalories.lunch} kcal</div>
                             </div>
                             <div className="food-grid">
                                 {recommendations.recommendations.lunch?.map((food, index) => (
@@ -214,10 +212,10 @@ const DietRecommender = () => {
                         <div className="meal-section">
                             <div className="meal-header">
                                 <div>
-                                    <h3>Dinner</h3>
+                                    <h3>🍽️ Dinner</h3>
                                     <span className="meal-time">18:30 - 20:00</span>
                                 </div>
-                                <div className="total-calories">Total: {recommendations.mealCalories.dinner} kcal</div>
+                                <div className="total-calories">🔥 Total: {recommendations.mealCalories.dinner} kcal</div>
                             </div>
                             <div className="food-grid">
                                 {recommendations.recommendations.dinner?.map((food, index) => (
@@ -229,10 +227,10 @@ const DietRecommender = () => {
                         <div className="meal-section">
                             <div className="meal-header">
                                 <div>
-                                    <h3>Snacks</h3>
+                                    <h3>🥨 Snacks</h3>
                                     <span className="meal-time">10:00 or 15:00</span>
                                 </div>
-                                <div className="total-calories">Total: {recommendations.mealCalories.snacks} kcal</div>
+                                <div className="total-calories">🔥 Total: {recommendations.mealCalories.snacks} kcal</div>
                             </div>
                             <div className="food-grid">
                                 {recommendations.recommendations.snacks?.map((food, index) => (

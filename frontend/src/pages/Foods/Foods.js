@@ -65,7 +65,7 @@ const Foods = () => {
 
         return () => observer.disconnect();
     }, []);    
-        const fetchFoods = async () => {
+    const fetchFoods = async () => {
         try {
             console.log('Start fetching foods...');
             setLoading(true);
@@ -94,7 +94,8 @@ const Foods = () => {
         } finally {
             setLoading(false);
         }
-    };    const handleAddFood = async (e) => {
+    };    
+    const handleAddFood = async (e) => {
         e.preventDefault();
         try {
             setLoading(true);
@@ -160,7 +161,8 @@ const Foods = () => {
         } finally {
             setLoading(false);
         }
-    };    const handleEditFood = (food) => {
+    };    
+    const handleEditFood = (food) => {
         setIsEditing(true);
         setCurrentFoodId(food._id);
         // Populate the form with the current food data
@@ -183,7 +185,8 @@ const Foods = () => {
             image: food.image || ''
         });
         setShowAddForm(true);
-    };    const handleUpdateFood = async (e) => {
+    };    
+    const handleUpdateFood = async (e) => {
         e.preventDefault();
         try {
             setLoading(true);

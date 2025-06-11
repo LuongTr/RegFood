@@ -1,28 +1,53 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+export function useAuth() {
+  return useContext(AuthContext);
+}
+
+export function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem('token'));
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(false);
+  }, []);
 
   const login = (userData, authToken) => {
-    setUser(userData);
-    setToken(authToken);
     localStorage.setItem('token', authToken);
+    localStorage.setItem('user', JSON.stringify(userData));
+    setToken(authToken);
+    setUser(userData);
   };
 
   const logout = () => {
-    setUser(null);
-    setToken(null);
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setToken(null);
+    setUser(null);
+  };
+
+  // Check if user has required role
+  const hasRole = (requiredRole) => {
+    if (!user) return false;
+    if (requiredRole === 'admin') return user.role === 'admin';
+    return true; // 'user' role or no specific role required
+  };
+
+  const value = {
+    token,
+    user,
+    login,
+    logout,
+    hasRole,
+    loading
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
-      {children}
+    <AuthContext.Provider value={value}>
+      {!loading && children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => useContext(AuthContext);
+}

@@ -38,6 +38,8 @@ app.use('/api/users', require('./src/routes/userRoutes'));
 app.use('/api/meals', require('./src/routes/mealRoutes'));
 app.use('/api/water', require('./src/routes/waterRoutes'));
 app.use('/api/diet-recommender', require('./src/routes/dietRecommenderRoutes'));
+// Thêm route cho quản lý tài khoản (chỉ dành cho admin)
+// app.use('/api/users', require('./src/routes/accountsRoutes'));
 // Food routes - special handling to avoid conflicts
 const foodListRoutes = require('./src/routes/foodListRoutes');
 

@@ -9,7 +9,11 @@ const Settings = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/signin');
+    navigate('/auth');
+  };
+
+  const handleChangePassword = () => {
+    navigate('/change-password');
   };
 
   return (
@@ -20,6 +24,13 @@ const Settings = () => {
         <div className="settings-section">
           <h2>Account</h2>
           <div className="settings-card">
+            <button 
+              className="password-button"
+              onClick={handleChangePassword}
+            >
+              Change Password
+            </button>
+            
             <button 
               className="logout-button"
               onClick={handleLogout}

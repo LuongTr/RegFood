@@ -10,14 +10,17 @@ import {
   FaAngleLeft,
   FaAngleRight,
   FaList,
+  FaUsers
 } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from './context/AuthContext';
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const toggleSidebar = () => setCollapsed(!collapsed);
 
   const location = useLocation();
+  const { hasRole } = useAuth();
 
   // Thêm class vào body dựa trên trạng thái collapsed
   useEffect(() => {
@@ -56,15 +59,27 @@ const Sidebar = () => {
       <Link to="/nutrition-tracking" className={`nav-item ${location.pathname === "/nutrition-tracking" ? "active" : ""}`}>
         <FaChartLine className="icon" />
         {!collapsed && <span>Nutrition Tracking</span>}
-      </Link>      <Link to="/diet-recommender" className={`nav-item ${location.pathname === "/diet-recommender" ? "active" : ""}`}>
+      </Link>
+      
+      <Link to="/diet-recommender" className={`nav-item ${location.pathname === "/diet-recommender" ? "active" : ""}`}>
         <FaUtensils className="icon" />
         {!collapsed && <span>Diet Recommender</span>}
       </Link>
 
-      <Link to="/foods" className={`nav-item ${location.pathname === "/foods" ? "active" : ""}`}>
-        <FaList className="icon" />
-        {!collapsed && <span>Food Database</span>}
-      </Link>
+      {hasRole('admin') && (
+        <>
+          <Link to="/foods" className={`nav-item ${location.pathname === "/foods" ? "active" : ""}`}>
+            <FaList className="icon" />
+            {!collapsed && <span>Food Database</span>}
+          </Link>
+          
+          {/* Thêm link mới đến trang Accounts */}
+          <Link to="/accounts" className={`nav-item ${location.pathname === "/accounts" ? "active" : ""}`}>
+            <FaUsers className="icon" />
+            {!collapsed && <span>Accounts</span>}
+          </Link>
+        </>
+      )}
 
       <Link to="/settings" className={`nav-item ${location.pathname === "/settings" ? "active" : ""}`}>
         <FaCog className="icon" />

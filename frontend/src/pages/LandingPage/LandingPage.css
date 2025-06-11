@@ -1,0 +1,60 @@
+.landing-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3rem;
+  background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+}
+
+.text-content {
+  flex: 1;
+  padding: 1rem 2rem;
+}
+
+.text-content h1 {
+  font-size: 3rem;
+  color: #4b2aad;
+}
+
+.text-content h3 {
+  font-size: 1.5rem;
+  color: #6c63ff;
+}
+
+.text-content p {
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  color: #555;
+  padding-bottom: 15px;
+}
+
+.image-content {
+  flex: 1;
+}
+
+.image-content img {
+  max-width: 100%;
+}
+
+.section {
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.btn-get-started {
+    display: inline-block; /* Keeps the button to adjust size */
+    background-color: #6E5DFF; /* Purple background */
+    color: white; /* White text color */
+    padding: 12px 24px; /* Padding around the button */
+    text-align: center; /* Center the text */
+    text-decoration: none; /* Remove underline */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 18px; /* Font size */
+    font-weight: bold; /* Bold text */
+    transition: background-color 0.3s, transform 0.2s; /* Smooth transitions */
+}
+
+.btn-get-started:hover {
+    background-color: #5C4FDC; /* Darker purple on hover */
+    transform: scale(1.05); /* Slightly increase size on hover */
+}

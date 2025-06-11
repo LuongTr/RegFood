@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth');
 const multer = require('multer');
 const path = require('path');
-const FoodDatabase = require('../models/FoodDatabase');
 const fs = require('fs');
+const FoodDatabase = require('../models/FoodDatabase');
+const roleAuth = require('../middleware/roleAuth');
 
 // Cấu hình multer cho upload ảnh
 const storage = multer.diskStorage({
@@ -47,8 +47,8 @@ const isValidUrl = (string) => {
     }
 };
 
-// Get all foods from the foods collection
-router.get('/', auth, async (req, res) => {
+// Get all foods - accessible by all authenticated users
+router.get('/', roleAuth(['user', 'admin']), async (req, res) => {
     try {
         console.log('Fetching foods from database...');
         const foods = await FoodDatabase.find({});
@@ -67,8 +67,8 @@ router.get('/', auth, async (req, res) => {
     }
 });
 
-// Add new food with image upload
-router.post('/', auth, upload.single('image'), async (req, res) => {    
+// Add new food - admin only
+router.post('/', roleAuth('admin'), upload.single('image'), async (req, res) => {    
     try {
         console.log('Received file:', req.file);
         console.log('Received body:', req.body);
@@ -145,8 +145,8 @@ router.post('/', auth, upload.single('image'), async (req, res) => {
     }
 });
 
-// Update existing food with image upload
-router.put('/:id', auth, upload.single('image'), async (req, res) => {    
+// Update food - admin only
+router.put('/:id', roleAuth('admin'), upload.single('image'), async (req, res) => {    
     try {
         console.log('Update food request for ID:', req.params.id);
         console.log('Request params full:', req.params);
@@ -260,8 +260,8 @@ router.put('/:id', auth, upload.single('image'), async (req, res) => {
     }
 });
 
-// Delete food
-router.delete('/:id', auth, async (req, res) => {
+// Delete food - admin only
+router.delete('/:id', roleAuth('admin'), async (req, res) => {
     try {
         console.log('Delete food request for ID:', req.params.id);
         console.log('Request params full:', req.params);

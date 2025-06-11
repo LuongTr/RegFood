@@ -19,6 +19,9 @@
   padding: 24px;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
   margin-bottom: 20px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .settings-card h2 {
@@ -41,6 +44,21 @@
 
 .logout-button:hover {
   background-color: #c82333;
+}
+
+.password-button {
+  background-color: #6c63ff; /* Sử dụng màu chủ đạo */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.password-button:hover {
+  background-color: #5a52e0; /* Màu tối hơn khi hover */
 }
 
 @media (max-width: 768px) {
