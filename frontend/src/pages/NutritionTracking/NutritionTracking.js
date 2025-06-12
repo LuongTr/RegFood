@@ -78,10 +78,25 @@ const NutritionTracking = () => {
             // Add logging to debug
             console.log('Processing meal:', meal);
             console.log('Food data:', foodData);
+            console.log('Meal type:', meal.mealType);
+            
+            // Normalize the meal type to match our keys
+            let mealTypeKey = meal.mealType?.toLowerCase() || '';
+            
+            // Convert 'snack' to 'snacks' for consistency with our object keys
+            if (mealTypeKey === 'snack') {
+              mealTypeKey = 'snacks';
+            }
+            
+            // Check if the meal type exists in our object
+            if (!mealsByType.hasOwnProperty(mealTypeKey)) {
+              console.warn(`Unknown meal type: ${mealTypeKey}, defaulting to snacks`);
+              mealTypeKey = 'snacks'; // Default to snacks if unknown meal type
+            }
             
             // Check if food has nutrition data
             if (foodData.nutritionPer100g) {
-              mealsByType[meal.mealType].push({
+              mealsByType[mealTypeKey].push({
                 id: meal._id,
                 name: foodData.name,
                 servingSize: meal.servingSize,

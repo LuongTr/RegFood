@@ -229,20 +229,20 @@ const DietRecommender = () => {
             
             <div className="macro-info">
               <div className="macro">
-                <span className="macro-value">{food.nutritionPer100g.calories}</span>
-                <span className="macro-label">kcal</span>
+                <span className="macro-value">{Math.round(food.nutritionPer100g?.calories || 0)}</span>
+                <span className="macro-label">K</span>
               </div>
               <div className="macro">
-                <span className="macro-value">{food.nutritionPer100g.protein}g</span>
-                <span className="macro-label">Protein</span>
+                <span className="macro-value">{Math.round(food.nutritionPer100g?.protein || 0)}</span>
+                <span className="macro-label">P</span> {/* Changed from PROTEIN */}
               </div>
               <div className="macro">
-                <span className="macro-value">{food.nutritionPer100g.carbs}g</span>
-                <span className="macro-label">Carbs</span>
+                <span className="macro-value">{Math.round(food.nutritionPer100g?.carbs || 0)}</span>
+                <span className="macro-label">C</span> {/* Changed from CARBS */}
               </div>
               <div className="macro">
-                <span className="macro-value">{food.nutritionPer100g.fat}g</span>
-                <span className="macro-label">Fat</span>
+                <span className="macro-value">{Math.round(food.nutritionPer100g?.fat || 0)}</span>
+                <span className="macro-label">F</span> {/* Changed from FAT */}
               </div>
             </div>
             

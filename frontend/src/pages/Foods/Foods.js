@@ -393,6 +393,15 @@ const showNotification = (message, type) => {
 
     const handleAddToMealPlan = async (food) => {
         try {
+            // Show meal type selection dialog
+            const mealType = await selectMealType();
+            
+            // If no meal type selected (user canceled), exit
+            if (!mealType) {
+                return;
+            }
+            
+            // Get token
             const token = localStorage.getItem('token');
             if (!token) {
                 toast.error("Please log in to add foods to your meal plan");
@@ -406,16 +415,16 @@ const showNotification = (message, type) => {
                 return;
             }
             
-            console.log("Adding food to meal plan:", food);
+            console.log("Adding food to meal plan:", food, "as", mealType);
             
             // Get today's date in YYYY-MM-DD format
             const today = new Date().toISOString().split('T')[0];
             
-            // Add food to meal plan
+            // Add food to meal plan with the selected meal type
             const response = await axios.post('/api/meals', {
                 foodId: food._id,
                 date: today,
-                mealType: 'lunch', // Default meal type
+                mealType: mealType, // Use the selected meal type
                 servingSize: 100,   // Default serving size
                 servingUnit: 'g'    // Default serving unit
             }, {
@@ -427,7 +436,7 @@ const showNotification = (message, type) => {
             });
             
             if (response.data && response.data.success) {
-                toast.success(`Added ${food.name} to your meal plan!`);
+                toast.success(`Added ${food.name} to your ${mealType} plan!`);
             } else {
                 throw new Error(response.data?.message || "Unknown error");
             }
@@ -439,10 +448,63 @@ const showNotification = (message, type) => {
                              err.response?.data?.error || 
                              err.message || 
                              'Failed to add to meal plan';
-                             
+                         
             toast.error(errorMsg);
         }
     };
+
+    // Add this function to show a meal type selection dialog
+const selectMealType = () => {
+    return new Promise((resolve) => {
+        // Create a modal for selecting meal type
+        const modalOverlay = document.createElement('div');
+        modalOverlay.className = 'modal-overlay';
+        
+        const modalContent = document.createElement('div');
+        modalContent.className = 'meal-type-modal';
+        
+        modalContent.innerHTML = `
+            <h3>Select Meal Type</h3>
+            <div class="meal-type-buttons">
+                <button class="meal-type-btn" data-type="breakfast">
+                    <span class="icon">🕖</span> Breakfast
+                </button>
+                <button class="meal-type-btn" data-type="lunch">
+                    <span class="icon">🕛</span> Lunch
+                </button>
+                <button class="meal-type-btn" data-type="dinner">
+                    <span class="icon">🕔</span> Dinner
+                </button>
+                <button class="meal-type-btn" data-type="snack">
+                    <span class="icon">🕘</span> Snack
+                </button>
+                <button class="cancel-btn">
+                    Cancel
+                </button>
+            </div>
+        `;
+        
+        modalOverlay.appendChild(modalContent);
+        document.body.appendChild(modalOverlay);
+        
+        // Add event listeners to buttons
+        const buttons = modalContent.querySelectorAll('.meal-type-btn');
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const mealType = button.getAttribute('data-type');
+                modalOverlay.remove();
+                resolve(mealType);
+            });
+        });
+        
+        // Add event listener to cancel button
+        const cancelBtn = modalContent.querySelector('.cancel-btn');
+        cancelBtn.addEventListener('click', () => {
+            modalOverlay.remove();
+            resolve(null);
+        });
+    });
+};
 
     const filteredFoods = foods.filter(food => 
         food.name.toLowerCase().includes(searchTerm.toLowerCase())

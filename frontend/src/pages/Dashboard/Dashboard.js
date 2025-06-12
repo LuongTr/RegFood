@@ -5,17 +5,30 @@ import {
   FaChartLine, FaArrowUp, FaArrowDown,
   FaAppleAlt, FaCheck, FaRunning, FaBookMedical
 } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { Bar, Doughnut } from 'react-chartjs-2';
 import 'chart.js/auto';
+import { toast } from 'react-toastify'; // Add this import for toast notifications
+import Chart from 'chart.js/auto';
+
+// Configure global Chart.js defaults to minimize padding
+Chart.defaults.plugins.legend.labels.padding = 8;
+Chart.defaults.layout.padding = 0;
+Chart.defaults.datasets.doughnut.borderWidth = 0;
+Chart.defaults.elements.arc.borderWidth = 0;
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { token } = useAuth();
   const [userData, setUserData] = useState(null);
   const [todaysMeals, setTodaysMeals] = useState([]);
+  // Add these missing state variables
+  const [calories, setCalories] = useState(0);
+  const [protein, setProtein] = useState(0);
+  const [carbs, setCarbs] = useState(0);
+  const [fat, setFat] = useState(0);
   const [nutritionStats, setNutritionStats] = useState({
     calories: { current: 0, goal: 2000 },
     protein: { current: 0, goal: 120 },
@@ -24,6 +37,7 @@ const Dashboard = () => {
   });
   const [recentWeight, setRecentWeight] = useState({ value: 0, trend: 'stable' });
   const [loading, setLoading] = useState(true);
+  const [hasMeals, setHasMeals] = useState(false);
 
   useEffect(() => {
     // Fetch user data, today's meals, and other stats
@@ -48,53 +62,105 @@ const Dashboard = () => {
         });
         
         // Fetch today's meals - ensure proper error handling and null checks
-        try {
-          const today = new Date().toISOString().split('T')[0];
-          const mealsResponse = await axios.get(
-            `http://localhost:5000/api/meals?date=${today}`,
-            {
+        const fetchMealsData = async () => {
+          try {
+            setLoading(true);
+            
+            // Get today's date in YYYY-MM-DD format
+            const today = new Date().toISOString().split('T')[0];
+            console.log('Dashboard: Fetching meals for date:', today);
+            
+            const response = await axios.get(`/api/meals/date/${today}`, {
+              baseURL: 'http://localhost:5000',
               headers: {
-                Authorization: `Bearer ${token}`
+                'Authorization': `Bearer ${token}`
               }
+            });
+            
+            console.log('Dashboard API response:', response.data);
+            
+            // Check if we have valid data
+            if (response.data && response.data.success) {
+              if (Array.isArray(response.data.data) && response.data.data.length > 0) {
+                // Process the data
+                const mealsData = response.data.data;
+                
+                // Set meals data and calculate totals
+                setTodaysMeals(mealsData);
+                
+                // Calculate nutrition totals
+                let totalCalories = 0;
+                let totalProtein = 0;
+                let totalCarbs = 0;
+                let totalFat = 0;
+                
+                mealsData.forEach(meal => {
+                  // Add null checks and use optional chaining
+                  if (meal?.foodId?.nutritionPer100g) {
+                    const servingRatio = (meal.servingSize || 100) / 100;
+                    totalCalories += (meal.foodId.nutritionPer100g.calories || 0) * servingRatio;
+                    totalProtein += (meal.foodId.nutritionPer100g.protein || 0) * servingRatio;
+                    totalCarbs += (meal.foodId.nutritionPer100g.carbs || 0) * servingRatio;
+                    totalFat += (meal.foodId.nutritionPer100g.fat || 0) * servingRatio;
+                  }
+                });
+                
+                // Debug what we're calculating
+                console.log("Calculated nutrition totals:", {
+                  calories: totalCalories,
+                  protein: totalProtein,
+                  carbs: totalCarbs,
+                  fat: totalFat
+                });
+                
+                // Update individual state variables
+                setCalories(Math.round(totalCalories));
+                setProtein(Math.round(totalProtein));
+                setCarbs(Math.round(totalCarbs));
+                setFat(Math.round(totalFat));
+                
+                // Also directly update nutritionStats to ensure immediate consistency
+                setNutritionStats(prev => ({
+                  ...prev,
+                  calories: { ...prev.calories, current: Math.round(totalCalories) },
+                  protein: { ...prev.protein, current: Math.round(totalProtein) },
+                  carbs: { ...prev.carbs, current: Math.round(totalCarbs) },
+                  fat: { ...prev.fat, current: Math.round(totalFat) }
+                }));
+                
+                // Mark that we have meals to display
+                setHasMeals(true);
+                
+                // Log what we're updating
+                console.log("Dashboard: Updating nutrition values:", {
+                  calories: Math.round(totalCalories),
+                  protein: Math.round(totalProtein),
+                  carbs: Math.round(totalCarbs),
+                  fat: Math.round(totalFat)
+                });
+              } else {
+                console.log('No meals found for today');
+                // Reset meal data
+                setTodaysMeals([]);
+                setCalories(0);
+                setProtein(0);
+                setCarbs(0);
+                setFat(0);
+                setHasMeals(false);
+              }
+            } else {
+              throw new Error(response.data?.message || 'Failed to fetch meals');
             }
-          );
-          
-          // Process meals data with null checks
-          if (mealsResponse?.data?.data) {
-            const meals = mealsResponse.data.data;
-            setTodaysMeals(meals || []); // Ensure it's always an array
-            
-            // Calculate nutrition totals
-            let totalCalories = 0;
-            let totalProtein = 0;
-            let totalCarbs = 0;
-            let totalFat = 0;
-            
-            meals.forEach(meal => {
-              // Add null checks
-              if (meal?.food?.nutritionPer100g) {
-                const servingRatio = (meal.servingSize || 100) / 100;
-                totalCalories += (meal.food.nutritionPer100g.calories || 0) * servingRatio;
-                totalProtein += (meal.food.nutritionPer100g.protein || 0) * servingRatio;
-                totalCarbs += (meal.food.nutritionPer100g.carbs || 0) * servingRatio;
-                totalFat += (meal.food.nutritionPer100g.fat || 0) * servingRatio;
-              }
-            });
-            
-            setNutritionStats({
-              calories: { current: Math.round(totalCalories), goal: 2000 },
-              protein: { current: Math.round(totalProtein), goal: 120 },
-              carbs: { current: Math.round(totalCarbs), goal: 250 },
-              fat: { current: Math.round(totalFat), goal: 65 }
-            });
-          } else {
-            // Set default empty values if no data
-            setTodaysMeals([]);
+          } catch (error) {
+            console.error('Error fetching meals data:', error);
+            toast.error('Failed to load meals data');
+            setHasMeals(false);
+          } finally {
+            setLoading(false);
           }
-        } catch (mealError) {
-          console.error('Error fetching meals:', mealError);
-          setTodaysMeals([]); // Set empty array on error
-        }
+        };
+        
+        fetchMealsData();
         
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -110,6 +176,18 @@ const Dashboard = () => {
       fetchDashboardData();
     }
   }, [token]);
+
+  // First add this useEffect to synchronize the individual state variables with nutritionStats
+  useEffect(() => {
+    // Update nutritionStats whenever individual macro values change
+    setNutritionStats(prev => ({
+      ...prev,
+      calories: { ...prev.calories, current: calories },
+      protein: { ...prev.protein, current: protein },
+      carbs: { ...prev.carbs, current: carbs },
+      fat: { ...prev.fat, current: fat }
+    }));
+  }, [calories, protein, carbs, fat]);
 
   // Chart data
   const macroData = {
@@ -165,12 +243,14 @@ const Dashboard = () => {
     // Add null check before forEach
     if (Array.isArray(todaysMeals)) {
       todaysMeals.forEach(meal => {
-        if (meal?.mealType && meal?.food) {
+        if (meal?.mealType && meal?.foodId) { // Changed from meal?.food to meal?.foodId
+          const mealType = meal.mealType.toLowerCase();
+          
           // Ensure the array exists before pushing
-          if (!mealGroups[meal.mealType]) {
-            mealGroups[meal.mealType] = [];
+          if (!mealGroups[mealType]) {
+            mealGroups[mealType] = [];
           }
-          mealGroups[meal.mealType].push(meal);
+          mealGroups[mealType].push(meal);
         }
       });
     }
@@ -275,77 +355,30 @@ const Dashboard = () => {
             {/* Dashboard Grid Layout */}
             <div className="dashboard-grid">
               {/* Today's Meals Section */}
-              <div className="dashboard-section todays-meals">
+              <div className="dashboard-section">
                 <div className="section-header">
                   <h2>Today's Meals</h2>
-                  <button 
-                    className="view-all-button"
-                    onClick={() => handleNavigate('/nutrition-tracking')}
-                  >
-                    View All
-                  </button>
+                  <Link to="/nutrition-tracking" className="view-all">View All</Link>
                 </div>
-                
-                <div className="meal-timeline">
-                  {Object.entries(mealGroups)
-                    // Filter out meal types with no meals
-                    .filter(([_, meals]) => meals.length > 0)
-                    .map(([type, meals]) => (
-                      <div key={type} className="meal-group">
-                        <div className="meal-type-header">
-                          <h3 className="meal-type">{type.charAt(0).toUpperCase() + type.slice(1)}</h3>
-                          <span className="meal-calories">
-                            {meals.reduce((sum, meal) => {
-                              const calories = meal.food?.nutritionPer100g?.calories || 0;
-                              const servingRatio = meal.servingSize / 100;
-                              return sum + (calories * servingRatio);
-                            }, 0).toFixed(0)} kcal
-                          </span>
+                <div className="meals-container">
+                  {loading ? (
+                    <p>Loading meals...</p>
+                  ) : hasMeals ? (
+                    todaysMeals.map((meal, index) => (
+                      <div key={index} className="meal-card">
+                        <div className="meal-info">
+                          <h3>{meal.foodId.name}</h3>
+                          <p>{meal.mealType}</p>
                         </div>
-                        
-                        <div className="meal-items">
-                          {meals.map((meal, index) => (
-                            <div key={index} className="meal-item">
-                              {meal.food?.image ? (
-                                <img 
-                                  src={`http://localhost:5000${meal.food.image}`} 
-                                  alt={meal.food.name} 
-                                  className="meal-image"
-                                  onError={(e) => {
-                                    e.target.onerror = null;
-                                    e.target.src = 'https://via.placeholder.com/50';
-                                  }}
-                                />
-                              ) : (
-                                <div className="meal-image-placeholder">
-                                  <FaUtensils />
-                                </div>
-                              )}
-                              <div className="meal-details">
-                                <p className="meal-name">{meal.food?.name}</p>
-                                <p className="meal-serving">{meal.servingSize}g</p>
-                              </div>
-                              <div className="meal-nutrition">
-                                <p className="meal-item-calories">
-                                  {Math.round((meal.food?.nutritionPer100g?.calories || 0) * meal.servingSize / 100)} kcal
-                                </p>
-                              </div>
-                            </div>
-                          ))}
+                        <div className="meal-nutrition">
+                          <span>{Math.round((meal.foodId.nutritionPer100g.calories || 0) * meal.servingSize / 100)} cal</span>
                         </div>
                       </div>
-                    ))}
-      
-                  {/* Show "Add Meal" button when no meals are present */}
-                  {Object.values(mealGroups).every(meals => meals.length === 0) && (
-                    <div className="no-meals">
-                      <p>No meals logged yet</p>
-                      <button 
-                        className="add-meal-button"
-                        onClick={() => handleNavigate('/foods')}
-                      >
-                        Add Food
-                      </button>
+                    ))
+                  ) : (
+                    <div className="empty-state">
+                      <p>No meals logged yet.</p>
+                      <button className="add-meal-btn">Add Food</button>
                     </div>
                   )}
                 </div>
@@ -360,7 +393,7 @@ const Dashboard = () => {
                 <div className="nutrition-charts">
                   <div className="chart-container">
                     <h3>Macronutrient Breakdown</h3>
-                    <div className="donut-chart">
+                    <div className="donut-chart" style={{ padding: 0, margin: '0 auto', position: 'relative' }}>
                       <Doughnut 
                         data={macroData}
                         options={{
@@ -388,6 +421,10 @@ const Dashboard = () => {
                             }
                           },
                           cutout: '70%',
+                          borderWidth: 0,
+                          layout: {
+                            padding: 0
+                          }
                         }}
                       />
                     </div>
