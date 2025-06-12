@@ -54,6 +54,12 @@ body.sidebar-collapsed .page-container {
   cursor: pointer;
 }
 
+.date-picker button:focus {
+  outline: none;
+  border-color: #6c63ff;
+  box-shadow: 0 0 0 0.05rem rgba(108, 99, 255, 0.25);
+}
+
 .calendar-popup {
   position: absolute;
   top: 100%;

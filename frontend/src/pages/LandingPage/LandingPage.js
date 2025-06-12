@@ -2,6 +2,8 @@ import React from "react";
 import Navbar from "./Navbar";
 import "./LandingPage.css";
 import picture from "./landing_picture.png";
+import about from "./Copilot_20250612_210232.png";
+import { FaEnvelope, FaGlobe, FaMapMarkerAlt } from "react-icons/fa";
 
 const LandingPage = () => {
   return (
@@ -20,14 +22,52 @@ const LandingPage = () => {
         </div>
       </section>
 
-      <section id="about" className="section">
-        <h2>About Us</h2>
-        <p>We help people make better meal choices based on their health data.</p>
+      <section id="about" className="about-section">
+        <div className="about-content-wrapper">
+          <div className="about-text">
+            <h2>About Us</h2>
+            <h3>Helping You Make Better Food Choices</h3>
+            <p>
+              At NutriScan, we believe that food is more than just fuel—it's a key to better health 
+              and well-being. Our mission is to help people make informed and personalized 
+              meal choices based on your unique health data. By leveraging cutting-edge 
+              technology, we provide tailored meal recommendations that align with dietary 
+              needs and simply aiming for a balanced diet.
+            </p>
+          </div>
+          <div className="about-image">
+            <img src={about} alt="About NutriScan" className="about-img" />
+          </div>
+        </div>
       </section>
 
-      <section id="contact" className="section">
-        <h2>Contact</h2>
-        <p>Email us at: NutriScan@gmail.com</p>
+      <section id="contact" className="contact-section">
+        <div className="contact-content">
+          <h2>Contact Us</h2>
+          <p>Have questions or need assistance? We'd love to hear from you!</p>
+          
+          <div className="contact-info-wrapper">
+            <div className="contact-info-item">
+              <FaEnvelope className="contact-icon" />
+              <span>NutriScan@gmail.com</span>
+            </div>
+            
+            <div className="contact-info-item">
+              <FaGlobe className="contact-icon" />
+              <span>www.nutrial.com</span>
+            </div>
+            
+            <div className="contact-info-item">
+              <FaMapMarkerAlt className="contact-icon" />
+              <span>Available globally</span>
+            </div>
+            
+            <div className="contact-info-item">
+              <FaMapMarkerAlt className="contact-icon" />
+              <span>Available globally</span>
+            </div>
+          </div>
+        </div>
       </section>
     </div>
   );

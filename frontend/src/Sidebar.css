@@ -86,3 +86,30 @@
     font-weight: bold;
   }
   
+    /* Add or update these styles in your sidebar CSS file */
+  
+  /* Update the icon size in collapsed state */
+  .sidebar.collapsed .menu-item-icon {
+    font-size: 20px; /* Increase from default size */
+    margin: 0 auto;
+  }
+  
+  /* Ensure the icon container has enough space */
+  .sidebar.collapsed .menu-item {
+    padding: 12px 8px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  /* Make sure icons are centered in collapsed mode */
+  .sidebar.collapsed .sidebar-menu {
+    align-items: center;
+  }
+  
+  /* Update the hover effect to include the icon */
+  .sidebar.collapsed .menu-item:hover {
+    background-color: rgba(108, 99, 255, 0.1);
+    border-radius: 8px;
+    width: 40px; /* Make hover area slightly larger */
+    margin: 0 auto;
+  }

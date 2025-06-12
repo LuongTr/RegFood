@@ -39,7 +39,7 @@
 }
 
 .search-input {
-    width: 100%;
+    /* width: 100%; */
     padding: 10px 10px 10px 40px;
     border-radius: 8px;
     border: 1px solid #ced4da;

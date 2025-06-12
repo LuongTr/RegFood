@@ -13,12 +13,12 @@
     background-color: #f8f9fa;
     min-height: 100vh;
     padding: 2rem;
-    transition: margin-left 0.3s ease; /* Thêm hiệu ứng chuyển đổi */
-    margin-left: 250px; /* Khoảng cách khi sidebar mở rộng */
+    transition: margin-left 0.3s ease;
+    margin-left: 250px;
   }
   
   body.sidebar-collapsed .page-container {
-    margin-left: 50px; /* Khoảng cách khi sidebar đóng */
+    margin-left: 50px;
   }
   
   .title {
@@ -180,4 +180,308 @@
   .alt-confidence {
     color: #666;
     font-size: 14px;
+  }
+
+  .fr-content-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+
+  .fr-header {
+    background-color: #746ee1;
+    color: white;
+    padding: 15px 20px;
+    text-align: center;
+    border-radius: 10px 10px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .fr-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+
+  .header-icon {
+    margin-right: 10px;
+    font-size: 1.2rem;
+  }
+
+  /* Upload section */
+  .fr-upload-section {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .fr-upload-area {
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 500px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-bottom: 20px;
+    overflow: hidden;
+    background-color: #f9f9f9;
+  }
+
+  .fr-upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #777;
+  }
+
+  .fr-upload-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: #6c63ff;
+  }
+
+  .fr-upload-placeholder p {
+    margin: 0 0 10px 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+
+  .fr-upload-placeholder span {
+    font-size: 0.9rem;
+  }
+
+  .fr-preview-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  /* Buttons */
+  .fr-button {
+    padding: 12px 25px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+
+  .fr-analyze-button {
+    background-color: #6c63ff;
+    color: white;
+    min-width: 150px;
+  }
+
+  .fr-analyze-button:hover {
+    background-color: #5a52d5;
+  }
+
+  .fr-upload-new {
+    background-color: #f0f0f0;
+    color: #333;
+  }
+
+  .fr-upload-new:hover {
+    background-color: #e0e0e0;
+  }
+
+  /* Loading state */
+  .fr-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+  }
+
+  .fr-spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top: 4px solid #6c63ff;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Error message */
+  .fr-error-message {
+    color: #d32f2f;
+    background-color: #ffebee;
+    padding: 15px;
+    border-radius: 6px;
+    margin: 20px 0;
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+  }
+
+  /* Results section */
+  .fr-results-section {
+    padding: 30px;
+  }
+
+  .fr-section-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .fr-result-container {
+    display: flex;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 25px;
+  }
+
+  .fr-result-image {
+    width: 280px;
+    height: 280px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .fr-result-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+  }
+
+  .fr-result-details {
+    flex: 1;
+    padding: 20px;
+  }
+
+  .fr-food-name {
+    font-size: 1.7rem;
+    margin: 0 0 10px 0;
+    color: #333;
+  }
+
+  .fr-confidence {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 20px;
+  }
+
+  .fr-alternatives {
+    background-color: #f0f0f0;
+    padding: 15px;
+    border-radius: 6px;
+  }
+
+  .fr-alt-heading {
+    font-weight: 500;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+
+  .fr-alt-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+  }
+
+  .fr-alt-list li {
+    padding: 5px 0;
+    color: #555;
+  }
+
+  /* Nutrition info */
+  .fr-nutrition-info {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+  }
+
+  .fr-nutrition-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+  }
+
+  .fr-nutrition-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+  }
+
+  .fr-nutrition-label {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 5px;
+  }
+
+  .fr-nutrition-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .fr-no-nutrition {
+    background-color: #f9f9f9;
+    padding: 20px;
+    text-align: center;
+    border-radius: 8px;
+    color: #666;
+    margin-bottom: 25px;
+  }
+
+  .fr-actions {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .fr-result-container {
+      flex-direction: column;
+    }
+    
+    .fr-result-image {
+      width: 100%;
+      height: auto;
+    }
+    
+    .fr-nutrition-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .fr-nutrition-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .fr-upload-area {
+      height: 200px;
+    }
   }

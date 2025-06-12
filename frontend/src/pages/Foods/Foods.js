@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { FaPlus, FaTrash } from 'react-icons/fa';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import './Foods.css';
 
 // Helper function to handle image URLs
@@ -47,6 +49,30 @@ const Foods = () => {
         preparationTime: '0',
         image: ''
     });
+    // First add this state to your component
+    const [notification, setNotification] = useState({
+        show: false,
+        message: '',
+        type: '' // 'success', 'error', or 'info'
+    });
+
+    // Add this helper function to show notifications
+const showNotification = (message, type) => {
+  setNotification({
+    show: true,
+    message,
+    type
+  });
+  
+  // Auto-hide the notification after 3 seconds
+  setTimeout(() => {
+    setNotification({
+      show: false,
+      message: '',
+      type: ''
+    });
+  }, 3000);
+};
 
     useEffect(() => {
         const handleSidebarChange = () => {
@@ -365,6 +391,59 @@ const Foods = () => {
         }
     };
 
+    const handleAddToMealPlan = async (food) => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                toast.error("Please log in to add foods to your meal plan");
+                return;
+            }
+            
+            // Check if food has an ID
+            if (!food._id) {
+                toast.error("Invalid food item. Missing food ID.");
+                console.error("Invalid food item:", food);
+                return;
+            }
+            
+            console.log("Adding food to meal plan:", food);
+            
+            // Get today's date in YYYY-MM-DD format
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Add food to meal plan
+            const response = await axios.post('/api/meals', {
+                foodId: food._id,
+                date: today,
+                mealType: 'lunch', // Default meal type
+                servingSize: 100,   // Default serving size
+                servingUnit: 'g'    // Default serving unit
+            }, {
+                baseURL: 'http://localhost:5000',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.data && response.data.success) {
+                toast.success(`Added ${food.name} to your meal plan!`);
+            } else {
+                throw new Error(response.data?.message || "Unknown error");
+            }
+        } catch (err) {
+            console.error('Error adding to meal plan:', err);
+            
+            // Extract detailed error message from response when available
+            const errorMsg = err.response?.data?.message || 
+                             err.response?.data?.error || 
+                             err.message || 
+                             'Failed to add to meal plan';
+                             
+            toast.error(errorMsg);
+        }
+    };
+
     const filteredFoods = foods.filter(food => 
         food.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -372,6 +451,11 @@ const Foods = () => {
     return (
         <div className={`main-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
             <div className="foods-container">
+                {notification.show && (
+                    <div className={`custom-notification ${notification.type}`}>
+                        <p>{notification.message}</p>
+                    </div>
+                )}
                 <div className="foods-header">
                     <h2>Food Database</h2>
                     <div className="foods-actions">
@@ -386,7 +470,7 @@ const Foods = () => {
                             className="add-food-btn"
                             onClick={() => setShowAddForm(true)}
                         >
-                            Add New Food
+                            <FaPlus/> Food
                         </button>
                     </div>
                 </div>
@@ -665,6 +749,16 @@ const Foods = () => {
                                             onClick={() => handleDeleteConfirm(food)}
                                         >
                                             Delete
+                                        </button>
+                                        <button 
+                                            className="add-meal-btn"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleAddToMealPlan(food);
+                                            }}
+                                            title="Add to Meal Plan"
+                                        >
+                                            +
                                         </button>
                                     </div>
                                 </div>

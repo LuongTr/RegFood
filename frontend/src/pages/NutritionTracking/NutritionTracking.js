@@ -27,16 +27,27 @@ const NutritionTracking = () => {
     const fetchMeals = async () => {
       try {
         setLoading(true);
+        
+        // Format the date in YYYY-MM-DD format for consistency
         const formattedDate = selectedDate.toISOString().split('T')[0];
+        console.log('Fetching meals for date:', formattedDate, 'Full date object:', selectedDate);
+        
+        // Add more debugging information
+        const year = selectedDate.getFullYear();
+        const month = selectedDate.getMonth() + 1; // Months are 0-indexed
+        const day = selectedDate.getDate();
+        console.log(`Year: ${year}, Month: ${month}, Day: ${day}`);
         
         const response = await axios.get(
-          `http://localhost:5000/api/meals?date=${formattedDate}`, 
+          `http://localhost:5000/api/meals/date/${formattedDate}`, // Changed from api/meals?date=
           {
             headers: {
               Authorization: `Bearer ${token}`
             }
           }
         );
+        
+        console.log('API response:', response.data);
         
         // Add validation to ensure data exists
         if (!response.data || !response.data.data || !Array.isArray(response.data.data)) {
@@ -60,17 +71,31 @@ const NutritionTracking = () => {
         };
         
         response.data.data.forEach(meal => {
-          if (meal.food) { // Make sure the food object exists
-            mealsByType[meal.mealType].push({
-              id: meal._id,
-              name: meal.food.name,
-              servingSize: meal.servingSize,
-              servingUnit: meal.servingUnit,
-              calories: calculateNutrition(meal.food.nutritionPer100g.calories, meal.servingSize),
-              protein: calculateNutrition(meal.food.nutritionPer100g.protein, meal.servingSize),
-              carbs: calculateNutrition(meal.food.nutritionPer100g.carbs, meal.servingSize),
-              fat: calculateNutrition(meal.food.nutritionPer100g.fat, meal.servingSize),
-            });
+          // Check if meal has proper food data after population
+          if (meal.foodId) { // Note: it might be meal.foodId instead of meal.food
+            const foodData = meal.foodId; // The populated food document
+            
+            // Add logging to debug
+            console.log('Processing meal:', meal);
+            console.log('Food data:', foodData);
+            
+            // Check if food has nutrition data
+            if (foodData.nutritionPer100g) {
+              mealsByType[meal.mealType].push({
+                id: meal._id,
+                name: foodData.name,
+                servingSize: meal.servingSize,
+                servingUnit: meal.servingUnit,
+                calories: calculateNutrition(foodData.nutritionPer100g.calories, meal.servingSize),
+                protein: calculateNutrition(foodData.nutritionPer100g.protein, meal.servingSize),
+                carbs: calculateNutrition(foodData.nutritionPer100g.carbs, meal.servingSize),
+                fat: calculateNutrition(foodData.nutritionPer100g.fat, meal.servingSize),
+              });
+            } else {
+              console.warn('Food missing nutrition data:', foodData);
+            }
+          } else {
+            console.warn('Meal missing food data:', meal);
           }
         });
         
@@ -192,6 +217,7 @@ const NutritionTracking = () => {
     setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 1));
   };
 
+  // Update the calendar day generation function
   const generateCalendarDays = () => {
     const year = selectedDate.getFullYear();
     const month = selectedDate.getMonth();
@@ -207,12 +233,19 @@ const NutritionTracking = () => {
     // Add the days of the month
     for (let i = 1; i <= lastDay.getDate(); i++) {
       const date = new Date(year, month, i);
+      const isSelectedDay = 
+        date.getDate() === selectedDate.getDate() && 
+        date.getMonth() === selectedDate.getMonth() && 
+        date.getFullYear() === selectedDate.getFullYear();
+        
       days.push(
         <div
           key={i}
-          className={`calendar-day ${date.toDateString() === selectedDate.toDateString() ? 'selected' : ''}`}
+          className={`calendar-day ${isSelectedDay ? 'selected' : ''}`}
           onClick={() => {
-            setSelectedDate(date);
+            const newDate = new Date(year, month, i);
+            console.log('Selected new date:', newDate);
+            setSelectedDate(newDate);
             setShowCalendar(false);
           }}
         >
@@ -269,9 +302,9 @@ const NutritionTracking = () => {
             ) : (
               <div className="no-foods">No foods added for {meal.type.toLowerCase()} yet.</div>
             )}
-            <button className="add-food-to-meal">
+            {/* <button className="add-food-to-meal">
               <FaPlus /> Add Food
-            </button>
+            </button> */}
           </div>
         </div>
       ))}
@@ -347,9 +380,9 @@ const NutritionTracking = () => {
               <input type="text" placeholder="Search foods..." />
             </div>
             
-            <button className="add-food-btn">
+            {/* <button className="add-food-btn">
               <FaPlus /> Add Food
-            </button>
+            </button> */}
           </div>
         </div>
 

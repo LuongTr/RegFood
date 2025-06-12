@@ -10,18 +10,78 @@
   min-height: 100vh;
   padding: 2rem;
   transition: margin-left 0.3s ease;
-  margin-left: 250px; /* Khoảng cách khi sidebar mở rộng */
+  margin-left: 250px;
 }
 
 body.sidebar-collapsed .page-container {
-  margin-left: 50px; /* Khoảng cách khi sidebar đóng */
+  margin-left: 50px;
 }
 
+/* Welcome section */
+.welcome-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.welcome-text h1 {
+  font-size: 28px;
+  margin: 0;
+  color: #333;
+}
+
+.date-today {
+  color: #666;
+  margin-top: 5px;
+}
+
+.quick-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.action-button.primary {
+  background-color: #6c63ff;
+  color: white;
+}
+
+.action-button.primary:hover {
+  background-color: #5a52e0;
+}
+
+.action-button.secondary {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.action-button.secondary:hover {
+  background-color: #dee2e6;
+}
+
+.action-icon {
+  font-size: 16px;
+}
+
+/* Stats grid */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 
 .stat-card {
@@ -29,23 +89,10 @@ body.sidebar-collapsed .page-container {
   border-radius: 16px;
   padding: 24px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 20px;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
-  border-left: 4px solid transparent;
   transition: all 0.3s ease;
-}
-
-.stat-card:nth-child(1) {
-  border-left-color: #2e7d32; /* Green for meals */
-}
-
-.stat-card:nth-child(2) {
-  border-left-color: #c2185b; /* Pink for calories */
-}
-
-.stat-card:nth-child(3) {
-  border-left-color: #1565c0; /* Blue for weight */
 }
 
 .stat-card:hover {
@@ -63,11 +110,6 @@ body.sidebar-collapsed .page-container {
   font-size: 24px;
 }
 
-.stat-icon.meals {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-}
-
 .stat-icon.calories {
   background-color: #fce4ec;
   color: #c2185b;
@@ -78,6 +120,15 @@ body.sidebar-collapsed .page-container {
   color: #1565c0;
 }
 
+.stat-icon.water {
+  background-color: #e1f5fe;
+  color: #0288d1;
+}
+
+.stat-info {
+  flex: 1;
+}
+
 .stat-info h3 {
   font-size: 14px;
   color: #666;
@@ -86,117 +137,460 @@ body.sidebar-collapsed .page-container {
 
 .stat-value {
   font-size: 24px;
-  font-weight: bold;
-  margin: 0;
+  font-weight: 700;
+  margin: 0 0 4px 0;
   color: #333;
 }
 
-.recent-meals-section {
+.stat-goal {
+  font-size: 13px;
+  color: #888;
+  margin: 0 0 10px 0;
+}
+
+.progress-bar {
+  height: 6px;
+  background-color: #f0f0f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.weight-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weight-trend {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.weight-trend.up {
+  color: #f44336;
+}
+
+.weight-trend.down {
+  color: #4caf50;
+}
+
+.weight-trend.stable {
+  color: #ff9800;
+}
+
+/* Dashboard grid layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 24px;
+}
+
+.dashboard-section {
   background: white;
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
 }
 
-.recent-meals-section h2 {
-  font-size: 20px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 20px 0;
+.dashboard-section.todays-meals {
+  grid-column: 1;
+  grid-row: 1 / span 2; /* Span 2 rows */
 }
 
-.meals-list {
+.dashboard-section.nutrition-insights {
+  grid-column: 2;
+  grid-row: 1;
   display: flex;
   flex-direction: column;
+  padding-bottom: 30px;
 }
 
-.meal-card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px;
-  border-bottom: 1px solid #f0f0f0;
+.dashboard-section.weekly-stats {
+  grid-column: 2;
+  grid-row: 2;
 }
 
-.meal-card:last-child {
-  border-bottom: none;
+/* Remove health goals section styles or comment them out */
+/* 
+.dashboard-section.health-goals {
+  grid-column: 1 / span 2;
+  grid-row: 3;
 }
+*/
 
-.meal-image {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  object-fit: cover;
-  background-color: #f8f9fa;
-}
-
-.meal-info {
-  flex: 1;
+.section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 20px;
 }
 
-.meal-details {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.meal-header {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.meal-header h3 {
-  font-size: 16px;
-  font-weight: 500;
-  color: #333;
+.section-header h2 {
+  font-size: 20px;
   margin: 0;
+  color: #333;
 }
 
-.meal-time {
-  color: #666;
+.view-all-button {
+  background: none;
+  border: none;
+  color: #6c63ff;
   font-size: 14px;
+  cursor: pointer;
 }
 
-.meal-name {
-  font-size: 14px;
-  color: #666;
+.view-all-button:hover {
+  text-decoration: underline;
+}
+
+/* Today's meals styles */
+.meal-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.meal-group {
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 20px;
+}
+
+.meal-group:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.meal-type-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.meal-type {
+  font-size: 17px;
+  color: #333;
   margin: 0;
 }
 
 .meal-calories {
-  font-size: 14px;
   color: #666;
-  margin: 0;
+  font-size: 15px;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
+.meal-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.meal-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.meal-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+  background-color: #f0f0f0;
+}
+
+.meal-image-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+}
+
+.meal-details {
+  flex: 1;
+}
+
+.meal-name {
+  margin: 0 0 2px 0;
+  font-size: 15px;
+  color: #333;
+}
+
+.meal-serving {
+  margin: 0;
+  font-size: 13px;
+  color: #888;
+}
+
+.meal-nutrition {
+  text-align: right;
+}
+
+.meal-item-calories {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+}
+
+.no-meals {
+  text-align: center;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.no-meals p {
+  margin: 0 0 12px 0;
+  color: #888;
+}
+
+.add-meal-button {
+  background-color: #6c63ff;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.add-meal-button:hover {
+  background-color: #5a52e0;
+}
+
+/* Nutrition insights styles */
+.nutrition-charts {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-container h3 {
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 16px;
+  color: #333;
+}
+
+/* Fix the donut chart height */
+.donut-chart {
+  position: relative;
+  height: 250px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+/* Add the macro nutrition bars with values */
+.macro-stats {
+  margin-top: 20px;
+  padding: 0 10px;
+}
+
+.macro-stat {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.macro-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.macro-value {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.macro-progress {
+  height: 8px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.macro-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.macro-stat.protein .macro-progress-fill {
+  background-color: #FF6384;
+}
+
+.macro-stat.carbs .macro-progress-fill {
+  background-color: #36A2EB;
+}
+
+.macro-stat.fat .macro-progress-fill {
+  background-color: #FFCE56;
+}
+
+/* Weekly stats styles */
+.bar-chart-container {
+  height: 250px;
+}
+
+/* Health goals styles */
+.goals-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.goal-item {
+  flex: 1;
+  min-width: 250px;
+  padding: 16px;
+  border-radius: 10px;
+  background-color: #f8f9fa;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.goal-status {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+}
+
+.goal-item.completed .goal-status {
+  background-color: #e8f5e9;
+}
+
+.goal-check {
+  color: #4caf50;
+}
+
+.goal-icon {
+  color: #6c63ff;
+}
+
+.goal-info {
+  flex: 1;
+}
+
+.goal-info h4 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.goal-info p {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.goal-progress {
+  height: 4px;
+  background-color: #f0f0f0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.goal-progress-fill {
+  height: 100%;
+  background-color: #6c63ff;
+  border-radius: 2px;
+}
+
+/* Loading spinner */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 18px;
+  color: #666;
+}
+
+/* Responsive styles */
+@media (max-width: 992px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-section.todays-meals,
+  .dashboard-section.nutrition-insights,
+  .dashboard-section.weekly-stats {
+    grid-column: 1;
+  }
+  
+  .dashboard-section.todays-meals {
+    grid-row: 1;
+  }
+  
+  .dashboard-section.nutrition-insights {
+    grid-row: 2;
+  }
+  
+  .dashboard-section.weekly-stats {
+    grid-row: 3;
+  }
+  
+  .goals-list {
+    flex-direction: column;
   }
 }
 
 @media (max-width: 768px) {
+  .welcome-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .quick-actions {
+    width: 100%;
+  }
+  
+  .action-button {
+    flex: 1;
+    justify-content: center;
+  }
+  
   .stats-grid {
     grid-template-columns: 1fr;
-  }
-  
-  .meal-card {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .meal-image {
-    width: 80px;
-    height: 80px;
-  }
-  
-  .meal-header {
-    flex-direction: column;
-    gap: 4px;
   }
 }

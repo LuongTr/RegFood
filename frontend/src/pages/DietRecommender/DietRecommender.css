@@ -39,8 +39,8 @@
 
 .calories-input input:focus {
     outline: none;
-    border-color: #4CAF50;
-    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+    border-color: #6c63ff;
+    box-shadow: 0 0 0 0.2rem rgba(108, 99, 255, 0.25);
 }
 
 .preferences {
@@ -319,6 +319,59 @@
 
 .add-to-meal-plan-btn:hover {
     background-color: #5a52e0;
+}
+
+/* Add these styles for the custom notification */
+
+.custom-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 25px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 500;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slide-in 0.3s ease-out forwards;
+}
+
+.custom-notification.success {
+  background-color: #4caf50;
+}
+
+.custom-notification.error {
+  background-color: #f44336;
+}
+
+.custom-notification.info {
+  background-color: #2196f3;
+}
+
+@keyframes slide-in {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.custom-notification.hide {
+  animation: slide-out 0.3s ease-in forwards;
 }
 
 /* Responsive Design */

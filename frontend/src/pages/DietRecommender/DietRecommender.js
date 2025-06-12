@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './DietRecommender.css';
 import { FaClock, FaUtensils, FaPlus } from 'react-icons/fa'
 
@@ -14,6 +15,11 @@ const DietRecommender = () => {
     const [maintenanceCalories, setMaintenanceCalories] = useState('');
     const [preferences, setPreferences] = useState([]);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [notification, setNotification] = useState({
+        show: false,
+        message: '',
+        type: '' // 'success', 'error', or 'info'
+    });
 
     useEffect(() => {
         const handleSidebarChange = () => {
@@ -103,6 +109,61 @@ const DietRecommender = () => {
             console.error('Error adding food to meal plan:', error);
             const errorMessage = error.response?.data?.message || 'Failed to add food to meal plan';
             toast.error(errorMessage);
+        }
+    };
+
+    const showNotification = (message, type) => {
+        setNotification({
+            show: true,
+            message,
+            type
+        });
+        
+        // Auto-hide the notification after 3 seconds
+        setTimeout(() => {
+            setNotification({
+                show: false,
+                message: '',
+                type: ''
+            });
+        }, 3000);
+    };
+
+    const handleAddToMealPlan = async (food) => {
+        try {
+            // First check if food already exists in meal plan
+            const checkResponse = await axios.get('http://localhost:5000/api/meal-plan', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            
+            const existingMeals = checkResponse.data;
+            const foodExists = existingMeals.some(meal => meal.foodId === food._id);
+            
+            if (foodExists) {
+                // Show notification if food already exists
+                showNotification(`${food.name} is already in your meal plan!`, 'info');
+                return;
+            }
+            
+            // Add food to meal plan if not already there
+            await axios.post('http://localhost:5000/api/meal-plan', {
+                foodId: food._id,
+                portionSize: 100,
+                mealType: 'lunch' // Default meal type
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            
+            // Success notification
+            showNotification(`Added ${food.name} to your meal plan!`, 'success');
+            
+        } catch (err) {
+            console.error('Error adding to meal plan:', err);
+            showNotification('Failed to add to meal plan', 'error');
         }
     };
 
