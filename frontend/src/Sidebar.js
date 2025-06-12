@@ -58,7 +58,7 @@ const Sidebar = () => {
 
       <Link to="/nutrition-tracking" className={`nav-item ${location.pathname === "/nutrition-tracking" ? "active" : ""}`}>
         <FaChartLine className="icon" />
-        {!collapsed && <span>Nutrition Tracking</span>}
+        {!collapsed && <span>Meal Plan</span>}
       </Link>
       
       <Link to="/diet-recommender" className={`nav-item ${location.pathname === "/diet-recommender" ? "active" : ""}`}>

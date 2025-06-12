@@ -1,121 +1,150 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth');
 const Meal = require('../models/Meal');
-const { body, validationResult } = require('express-validator');
+const auth = require('../middleware/auth');
+const FoodDatabase = require('../models/FoodDatabase');
 
-// Add a new meal
-router.post('/', auth, [
-  body('type').isIn(['breakfast', 'lunch', 'dinner', 'snack']),
-  body('date').isISO8601(),
-  body('foods').isArray()
-], async (req, res) => {
+/**
+ * @route POST /api/meals
+ * @desc Add a food to user's meal plan
+ * @access Private
+ */
+router.post('/', auth, async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+    console.log('Received meal request:', req.body);
+    const { foodId, mealType, servingSize, servingUnit, date } = req.body;
+    
+    // Validate required fields
+    if (!foodId || !mealType) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Food ID and meal type are required' 
+      });
     }
-
-    const meal = new Meal({
-      ...req.body,
-      userId: req.user.id
+    
+    // Check if food exists in database
+    const food = await FoodDatabase.findById(foodId);
+    if (!food) {
+      console.log('Food not found:', foodId);
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Food not found' 
+      });
+    }
+    
+    // Default values
+    const mealData = {
+      user: req.user.id,
+      food: foodId,
+      mealType,
+      servingSize: servingSize || food.servingSize || 100,
+      servingUnit: servingUnit || food.servingUnit || 'g',
+      date: date || new Date().toISOString().split('T')[0]
+    };
+    
+    console.log('Creating meal with data:', mealData);
+    
+    // Create meal entry
+    const newMeal = new Meal(mealData);
+    
+    await newMeal.save();
+    
+    console.log('Meal created:', newMeal);
+    
+    res.status(201).json({
+      success: true,
+      message: 'Food added to meal plan',
+      data: newMeal
     });
-
-    await meal.save();
-    res.status(201).json(meal);
+    
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error adding food to meal plan:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
   }
 });
 
-// Get meals for a date range
+/**
+ * @route GET /api/meals
+ * @desc Get all meals for the user for a specific date
+ * @access Private
+ */
 router.get('/', auth, async (req, res) => {
   try {
-    const { startDate, endDate } = req.query;
-    const query = {
-      userId: req.user.id
-    };
-
-    if (startDate && endDate) {
-      query.date = {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate)
-      };
-    }
-
-    const meals = await Meal.find(query)
-      .sort({ date: -1 })
-      .populate('foods.foodId');
-
-    res.json(meals);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Update a meal
-router.put('/:mealId', auth, async (req, res) => {
-  try {
-    const meal = await Meal.findOneAndUpdate(
-      { _id: req.params.mealId, userId: req.user.id },
-      { $set: req.body },
-      { new: true }
-    );
-
-    if (!meal) {
-      return res.status(404).json({ message: 'Meal not found' });
-    }
-
-    res.json(meal);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Delete a meal
-router.delete('/:mealId', auth, async (req, res) => {
-  try {
-    const meal = await Meal.findOneAndDelete({
-      _id: req.params.mealId,
-      userId: req.user.id
-    });
-
-    if (!meal) {
-      return res.status(404).json({ message: 'Meal not found' });
-    }
-
-    res.json({ message: 'Meal deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Get meal summary for dashboard
-router.get('/summary', auth, async (req, res) => {
-  try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const { date } = req.query;
     
+    if (!date) {
+      return res.status(400).json({
+        success: false,
+        message: 'Date is required'
+      });
+    }
+    
+    // Find meals for the user on the specified date
     const meals = await Meal.find({
-      userId: req.user.id,
-      date: {
-        $gte: today,
-        $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000)
-      }
+      user: req.user.id,
+      date
+    }).populate('food');
+    
+    console.log(`Found ${meals.length} meals for date ${date}`);
+    
+    res.json({
+      success: true,
+      count: meals.length,
+      data: meals
     });
-
-    const summary = {
-      totalMeals: meals.length,
-      totalCalories: meals.reduce((sum, meal) => sum + meal.totalCalories, 0),
-      totalProtein: meals.reduce((sum, meal) => sum + meal.totalProtein, 0),
-      totalCarbs: meals.reduce((sum, meal) => sum + meal.totalCarbs, 0),
-      totalFat: meals.reduce((sum, meal) => sum + meal.totalFat, 0),
-      meals: meals
-    };
-
-    res.json(summary);
+    
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error fetching meals:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+});
+
+/**
+ * @route DELETE /api/meals/:id
+ * @desc Delete a meal from the meal plan
+ * @access Private
+ */
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const meal = await Meal.findById(req.params.id);
+    
+    if (!meal) {
+      return res.status(404).json({
+        success: false,
+        message: 'Meal not found'
+      });
+    }
+    
+    // Check if the meal belongs to the user
+    if (meal.user.toString() !== req.user.id) {
+      return res.status(401).json({
+        success: false,
+        message: 'Not authorized to delete this meal'
+      });
+    }
+    
+    await meal.deleteOne(); // Using deleteOne() instead of remove() which is deprecated
+    
+    res.json({
+      success: true,
+      message: 'Meal removed from meal plan'
+    });
+    
+  } catch (error) {
+    console.error('Error deleting meal:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
   }
 });
 

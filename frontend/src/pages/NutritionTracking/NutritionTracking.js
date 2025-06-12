@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import "./NutritionTracking.css";
-import { FaFire, FaUtensils, FaLeaf, FaTint, FaPlus, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaFire, FaUtensils, FaLeaf, FaTint, FaPlus, FaChevronLeft, FaChevronRight, FaTrash } from 'react-icons/fa';
+import axios from 'axios';
+import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const NutritionTracking = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -8,37 +11,170 @@ const NutritionTracking = () => {
   const [activeTab, setActiveTab] = useState('Meals');
   const [waterAmount, setWaterAmount] = useState(1.2);
   const [waterInput, setWaterInput] = useState(250);
-  
-  const stats = {
-    calories: { current: 1486, goal: 2000, icon: <FaFire />, color: "#ff7043" },
-    protein: { current: 86, goal: 120, unit: "g", icon: <FaUtensils />, color: "#ec407a" },
-    carbs: { current: 164, goal: 250, unit: "g", icon: <FaLeaf />, color: "#66bb6a" },
+  const [meals, setMeals] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [stats, setStats] = useState({
+    calories: { current: 0, goal: 2000, icon: <FaFire />, color: "#ff7043" },
+    protein: { current: 0, goal: 120, unit: "g", icon: <FaUtensils />, color: "#ec407a" },
+    carbs: { current: 0, goal: 250, unit: "g", icon: <FaLeaf />, color: "#66bb6a" },
     water: { current: 1.2, goal: 2.5, unit: "L", icon: <FaTint />, color: "#42a5f5" }
-  };
-
-  const meals = [
-    {
-      type: "Breakfast",
-      time: "8:30 AM",
-      calories: 470,
-      foods: [
-        {
-          name: "Oatmeal with Berries",
-          calories: "320 kcal",
-          protein: "12g protein",
-          carbs: "58g carbs",
-          fat: "6g fat"
-        },
-        {
-          name: "Greek Yogurt",
-          calories: "150 kcal",
-          protein: "15g protein",
-          carbs: "8g carbs",
-          fat: "5g fat"
+  });
+  
+  const { token } = useAuth();
+  
+  // Fetch meals for the selected date
+  useEffect(() => {
+    const fetchMeals = async () => {
+      try {
+        setLoading(true);
+        const formattedDate = selectedDate.toISOString().split('T')[0];
+        
+        const response = await axios.get(
+          `http://localhost:5000/api/meals?date=${formattedDate}`, 
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+        
+        // Add validation to ensure data exists
+        if (!response.data || !response.data.data || !Array.isArray(response.data.data)) {
+          console.error('Invalid meal data format:', response.data);
+          setMeals([
+            { type: "Breakfast", time: "8:30 AM", foods: [] },
+            { type: "Lunch", time: "12:30 PM", foods: [] },
+            { type: "Dinner", time: "7:00 PM", foods: [] },
+            { type: "Snacks", time: "3:30 PM", foods: [] }
+          ]);
+          setLoading(false);
+          return;
         }
-      ]
+        
+        // Group meals by mealType
+        const mealsByType = {
+          breakfast: [],
+          lunch: [],
+          dinner: [],
+          snacks: []
+        };
+        
+        response.data.data.forEach(meal => {
+          if (meal.food) { // Make sure the food object exists
+            mealsByType[meal.mealType].push({
+              id: meal._id,
+              name: meal.food.name,
+              servingSize: meal.servingSize,
+              servingUnit: meal.servingUnit,
+              calories: calculateNutrition(meal.food.nutritionPer100g.calories, meal.servingSize),
+              protein: calculateNutrition(meal.food.nutritionPer100g.protein, meal.servingSize),
+              carbs: calculateNutrition(meal.food.nutritionPer100g.carbs, meal.servingSize),
+              fat: calculateNutrition(meal.food.nutritionPer100g.fat, meal.servingSize),
+            });
+          }
+        });
+        
+        // Convert to array of meal objects
+        const formattedMeals = [
+          { type: "Breakfast", time: "8:30 AM", foods: mealsByType.breakfast },
+          { type: "Lunch", time: "12:30 PM", foods: mealsByType.lunch },
+          { type: "Dinner", time: "7:00 PM", foods: mealsByType.dinner },
+          { type: "Snacks", time: "3:30 PM", foods: mealsByType.snacks }
+        ];
+        
+        // Calculate total nutrition
+        let totalCalories = 0;
+        let totalProtein = 0;
+        let totalCarbs = 0;
+        
+        formattedMeals.forEach(meal => {
+          meal.foods.forEach(food => {
+            totalCalories += food.calories;
+            totalProtein += food.protein;
+            totalCarbs += food.carbs;
+          });
+        });
+        
+        // Update stats
+        setStats(prev => ({
+          ...prev,
+          calories: { ...prev.calories, current: Math.round(totalCalories) },
+          protein: { ...prev.protein, current: Math.round(totalProtein) },
+          carbs: { ...prev.carbs, current: Math.round(totalCarbs) }
+        }));
+        
+        setMeals(formattedMeals);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching meals:', error);
+        setLoading(false);
+        toast.error('Failed to fetch meals');
+      }
+    };
+    
+    if (token) {
+      fetchMeals();
     }
-  ];
+  }, [selectedDate, token]);
+  
+  // Helper function to calculate nutrition based on serving size
+  const calculateNutrition = (nutritionPer100g, servingSize) => {
+    return (nutritionPer100g / 100) * servingSize;
+  };
+  
+  // Function to calculate total calories for a meal
+  const calculateMealCalories = (foods) => {
+    return foods.reduce((total, food) => total + food.calories, 0);
+  };
+  
+  const handleDeleteFood = async (mealId) => {
+    try {
+      await axios.delete(
+        `http://localhost:5000/api/meals/${mealId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      
+      // Instead of refetching, update the state directly
+      setMeals(prevMeals => 
+        prevMeals.map(meal => ({
+          ...meal,
+          foods: meal.foods.filter(food => food.id !== mealId)
+        }))
+      );
+      
+      // Find and subtract the removed food's nutrition from stats
+      const removedFood = meals
+        .flatMap(meal => meal.foods)
+        .find(food => food.id === mealId);
+        
+      if (removedFood) {
+        setStats(prev => ({
+          ...prev,
+          calories: { 
+            ...prev.calories, 
+            current: Math.max(0, prev.calories.current - Math.round(removedFood.calories)) 
+          },
+          protein: { 
+            ...prev.protein, 
+            current: Math.max(0, prev.protein.current - Math.round(removedFood.protein)) 
+          },
+          carbs: { 
+            ...prev.carbs, 
+            current: Math.max(0, prev.carbs.current - Math.round(removedFood.carbs)) 
+          }
+        }));
+      }
+      
+      toast.success('Food removed from meal plan');
+    } catch (error) {
+      console.error('Error removing food:', error);
+      toast.error('Failed to remove food from meal plan');
+    }
+  };
 
   const formatDate = (date) => {
     return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -91,6 +227,12 @@ const NutritionTracking = () => {
   const handleAddWater = () => {
     const newAmount = Math.min(waterAmount + (waterInput / 1000), 2.5);
     setWaterAmount(newAmount);
+    
+    // Update the water stats
+    setStats(prev => ({
+      ...prev,
+      water: { ...prev.water, current: newAmount }
+    }));
   };
 
   const renderMealsTab = () => (
@@ -102,30 +244,37 @@ const NutritionTracking = () => {
               <h3 className="meal-title">{meal.type}</h3>
               <span className="meal-time">{meal.time}</span>
             </div>
-            <span className="meal-calories">{meal.calories} calories</span>
+            <span className="meal-calories">{calculateMealCalories(meal.foods)} calories</span>
           </div>
           
           <div className="food-items">
-            {meal.foods.map((food, foodIndex) => (
-              <div key={foodIndex} className="food-item">
-                <div className="food-name">{food.name}</div>
-                <div className="food-nutrients">
-                  <span className="nutrient calories">{food.calories}</span>
-                  <span className="nutrient protein">{food.protein}</span>
-                  <span className="nutrient carbs">{food.carbs}</span>
-                  <span className="nutrient fat">{food.fat}</span>
+            {meal.foods.length > 0 ? (
+              meal.foods.map((food, foodIndex) => (
+                <div key={foodIndex} className="food-item">
+                  <div className="food-name">{food.name}</div>
+                  <div className="food-nutrients">
+                    <span className="nutrient calories">{Math.round(food.calories)} kcal</span>
+                    <span className="nutrient protein">{Math.round(food.protein)}g protein</span>
+                    <span className="nutrient carbs">{Math.round(food.carbs)}g carbs</span>
+                    <span className="nutrient fat">{Math.round(food.fat)}g fat</span>
+                    <button 
+                      className="delete-food-btn" 
+                      onClick={() => handleDeleteFood(food.id)}
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div className="no-foods">No foods added for {meal.type.toLowerCase()} yet.</div>
+            )}
             <button className="add-food-to-meal">
               <FaPlus /> Add Food
             </button>
           </div>
         </div>
       ))}
-      <button className="add-meal-btn">
-        <FaPlus /> Add Meal
-      </button>
     </div>
   );
 
@@ -166,7 +315,7 @@ const NutritionTracking = () => {
     <div className="page-container">
       <div className="nutrition-container">
         <div className="nutrition-header">
-          <h1>Nutrition Tracker</h1>
+          <h1>Meal Plan</h1>
           <p>Track your daily nutrition intake and monitor your progress</p>
           
           <div className="header-controls">

@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-toastify';
 import './DietRecommender.css';
+import { FaClock, FaUtensils, FaPlus } from 'react-icons/fa'
+
 
 const DietRecommender = () => {
+    const { token } = useAuth();
     const [recommendations, setRecommendations] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -66,6 +71,41 @@ const DietRecommender = () => {
         }
     };
 
+    const addFoodToMealPlan = async (food, mealType) => {
+        try {
+            // Debug logs
+            console.log('Adding food to meal plan:', { food, mealType });
+            
+            const payload = {
+                foodId: food._id,
+                mealType: mealType.toLowerCase(), // breakfast, lunch, dinner, snacks
+                servingSize: food.servingSize || 100,
+                servingUnit: food.servingUnit || 'g',
+                date: new Date().toISOString().split('T')[0] // Today's date
+            };
+            
+            console.log('Sending payload:', payload);
+            
+            const response = await axios.post(
+                'http://localhost:5000/api/meals',
+                payload,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+            
+            console.log('Server response:', response.data);
+            
+            toast.success(`Added ${food.name} to your ${mealType}`);
+        } catch (error) {
+            console.error('Error adding food to meal plan:', error);
+            const errorMessage = error.response?.data?.message || 'Failed to add food to meal plan';
+            toast.error(errorMessage);
+        }
+    };
+
     const getMealTime = (mealType) => {
         switch(mealType) {
             case 'breakfast':
@@ -109,25 +149,60 @@ const DietRecommender = () => {
                 </div>
             </div>
         );
-    };    const renderMealCard = (food) => (
-        <div className="food-card">
-            <div className="food-content">
-                <div className="food-main">
-                    <h4 className="food-name">{food.name}</h4>
-                    <div className="macros">
-                        <span className="macro protein">P: {food.nutritionPer100g?.protein || 0}g</span>
-                        <span className="macro carbs">C: {food.nutritionPer100g?.carbs || 0}g</span>
-                        <span className="macro fat">F: {food.nutritionPer100g?.fat || 0}g</span>
-                    </div>
+    };    const renderFoodCard = (food, mealType) => (
+        <div className="food-card" key={food._id}>
+          <div className="food-content">
+            <div className="food-header">
+              <h3>{food.name}</h3>
+              {food.image ? (
+                <div className="food-image-thumbnail">
+                  <img 
+                    src={food.image.startsWith('http') ? food.image : `http://localhost:5000${food.image}`} 
+                    alt={food.name} 
+                  />
                 </div>
-                <div className="food-details">
-                    <span className="calories">🔥 {food.nutritionPer100g?.calories || 0} kcal</span>
-                    <span className="prep-time">⏱️ {food.preparationTime || 30} mins</span>
-                </div>
-                <p className="description">{food.description || "Delicious and nutritious meal option."}</p>
+              ) : null}
             </div>
+            
+            <p className="food-description">{food.description}</p>
+            
+            <div className="macro-info">
+              <div className="macro">
+                <span className="macro-value">{food.nutritionPer100g.calories}</span>
+                <span className="macro-label">kcal</span>
+              </div>
+              <div className="macro">
+                <span className="macro-value">{food.nutritionPer100g.protein}g</span>
+                <span className="macro-label">Protein</span>
+              </div>
+              <div className="macro">
+                <span className="macro-value">{food.nutritionPer100g.carbs}g</span>
+                <span className="macro-label">Carbs</span>
+              </div>
+              <div className="macro">
+                <span className="macro-value">{food.nutritionPer100g.fat}g</span>
+                <span className="macro-label">Fat</span>
+              </div>
+            </div>
+            
+            <div className="preparation-info">
+              <span className="prep-time">
+                <FaClock /> {food.preparationTime || '0'} mins
+              </span>
+              <span className="serving">
+                <FaUtensils /> {food.servingSize}{food.servingUnit}
+              </span>
+            </div>
+            
+            <button 
+              className="add-to-meal-plan-btn"
+              onClick={() => addFoodToMealPlan(food, mealType)}
+            >
+              <FaPlus /> Add to Meal Plan
+            </button>
+          </div>
         </div>
-    );
+      );
 
     return (
         <div className={`main-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
@@ -189,7 +264,7 @@ const DietRecommender = () => {
                             </div>
                             <div className="food-grid">
                                 {recommendations.recommendations.breakfast?.map((food, index) => (
-                                    renderMealCard(food)
+                                    renderFoodCard(food, 'breakfast')
                                 ))}
                             </div>
                         </div>
@@ -204,7 +279,7 @@ const DietRecommender = () => {
                             </div>
                             <div className="food-grid">
                                 {recommendations.recommendations.lunch?.map((food, index) => (
-                                    renderMealCard(food)
+                                    renderFoodCard(food, 'lunch')
                                 ))}
                             </div>
                         </div>
@@ -219,7 +294,7 @@ const DietRecommender = () => {
                             </div>
                             <div className="food-grid">
                                 {recommendations.recommendations.dinner?.map((food, index) => (
-                                    renderMealCard(food)
+                                    renderFoodCard(food, 'dinner')
                                 ))}
                             </div>
                         </div>
@@ -234,7 +309,7 @@ const DietRecommender = () => {
                             </div>
                             <div className="food-grid">
                                 {recommendations.recommendations.snacks?.map((food, index) => (
-                                    renderMealCard(food)
+                                    renderFoodCard(food, 'snacks')
                                 ))}
                             </div>
                         </div>

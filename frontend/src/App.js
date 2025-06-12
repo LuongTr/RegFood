@@ -16,6 +16,7 @@ import DietRecommender from "./pages/DietRecommender/DietRecommender";
 import Foods from "./pages/Foods/Foods";
 import Accounts from "./pages/Accounts/Accounts";
 import LandingPage from "./pages/LandingPage/LandingPage";
+import Chatbot from './components/Chatbot/Chatbot';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -99,6 +100,9 @@ function AppContent() {
           </RoleProtectedRoute>
         } />
       </Routes>
+      
+      {/* Add the Chatbot component so it's available on all pages */}
+      <Chatbot />
     </>
   );
 }

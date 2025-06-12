@@ -104,7 +104,7 @@ body.sidebar-collapsed .page-container {
 }
 
 .add-food-btn {
-  background-color: #1a1a1a;
+  background-color: #6c63ff;
   color: white;
   border: none;
   padding: 8px 20px;
@@ -114,6 +114,10 @@ body.sidebar-collapsed .page-container {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.add-food-btn:hover {
+  background-color: #5a52e0;
 }
 
 /* Stats Cards */
@@ -283,7 +287,7 @@ body.sidebar-collapsed .page-container {
 .add-meal-btn {
   width: 100%;
   padding: 16px;
-  background-color: #1a1a1a;
+  background-color: #6c63ff;
   color: white;
   border: none;
   border-radius: 12px;
@@ -294,6 +298,10 @@ body.sidebar-collapsed .page-container {
   align-items: center;
   justify-content: center;
   gap: 8px;
+}
+
+.add-meal-btn:hover {
+  background-color: #5a52e0;
 }
 
 /* Water Section */
@@ -376,6 +384,34 @@ body.sidebar-collapsed .page-container {
   border-radius: 8px;
   cursor: pointer;
   font-size: 15px;
+}
+
+/* Thêm style cho nút xóa food */
+.delete-food-btn {
+  background: transparent;
+  border: none;
+  color: #ff5757;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+}
+
+.delete-food-btn:hover {
+  color: #e63946;
+}
+
+.no-foods {
+  padding: 16px;
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 10px;
 }
 
 @media (max-width: 1200px) {

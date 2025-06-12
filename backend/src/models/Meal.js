@@ -1,61 +1,37 @@
 const mongoose = require('mongoose');
 
-const mealSchema = new mongoose.Schema({
-  userId: {
+const MealSchema = new mongoose.Schema({
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
-  date: {
-    type: Date,
+  food: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'FoodDatabase', // Points to your food collection
     required: true
   },
-  type: {
+  mealType: {
     type: String,
-    enum: ['breakfast', 'lunch', 'dinner', 'snack'],
+    enum: ['breakfast', 'lunch', 'dinner', 'snacks'],
     required: true
   },
-  foods: [{
-    foodId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'FoodDatabase'
-    },
-    name: String,
-    calories: Number,
-    protein: Number,
-    carbs: Number,
-    fat: Number,
-    portion: Number,
-    unit: String,
-    image: String
-  }],
-  totalCalories: {
+  servingSize: {
     type: Number,
-    default: 0
+    required: true,
+    default: 100
   },
-  totalProtein: {
-    type: Number,
-    default: 0
+  servingUnit: {
+    type: String,
+    required: true,
+    default: 'g'
   },
-  totalCarbs: {
-    type: Number,
-    default: 0
-  },
-  totalFat: {
-    type: Number,
-    default: 0
+  date: {
+    type: String, // Store as YYYY-MM-DD
+    required: true
   }
 }, {
   timestamps: true
 });
 
-// Calculate totals before saving
-mealSchema.pre('save', function(next) {
-  this.totalCalories = this.foods.reduce((sum, food) => sum + (food.calories || 0), 0);
-  this.totalProtein = this.foods.reduce((sum, food) => sum + (food.protein || 0), 0);
-  this.totalCarbs = this.foods.reduce((sum, food) => sum + (food.carbs || 0), 0);
-  this.totalFat = this.foods.reduce((sum, food) => sum + (food.fat || 0), 0);
-  next();
-});
-
-module.exports = mongoose.model('Meal', mealSchema);
+module.exports = mongoose.model('Meal', MealSchema);
